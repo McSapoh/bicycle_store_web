@@ -1,0 +1,43 @@
+﻿@model bicycle_store_web.Type
+ 
+<h2 class="text-dark text-center">@(Model.Id!=0 ? "Edit" : "Create") Type</h2>
+<form id="typeForm">
+    @if (Model.Id != 0)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+    <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="Name"></label>
+        </div>
+        <div class="col-8">
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="Description"></label>
+        </div>
+        <div class="col-8">
+            <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-12  d-flex flex-row">
+            <button type="button" class="btn btn-primary form-control m-1"
+                    onclick="saveObject('/Admin/SaveType', '#typeForm')">
+                @(Model.Id != 0 ? "Update" : "Create")
+            </button>
+            <button type="button" class="btn btn-primary form-control m-1" data-dismiss="modal">
+                Close
+            </button>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

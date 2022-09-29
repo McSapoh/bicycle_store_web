@@ -1,0 +1,37 @@
+﻿insert into Types (Name, Description) values 
+ ('Mountain', 'Mountain bicycle is a bicycle designed for off-road cycling'),
+ ('Cross', 'Cross bicycle is a specific form of drop-bar bicycle that is built to tackle the popular racing discipline that is cyclocross'),
+ ('Road', 'Road bicycle is bicycle designed to take you as far and as fast as your legs can manage on paved surfaces'),
+ ('City', 'City bicycle is a bicycle used predominantly for trips in urban areas'),
+ ('Hybrid', 'Hybrid bicycle is a bicycle which combines road bicycle and road bicycle'),
+ ('Cruiser', 'Cruiser bicycle is a bicycle is a bicycle that usually combines balloon tires, an upright seating posture, a single-speed drivetrain, and straightforward steel construction with expressive styling');
+insert into Producers (Name, Description) values 
+ ('Scott', 'Scott Sports SA (formerly Scott USA) is a Swiss producer of bicycles, winter equipment, motorsports gear and sportswear. The companys main office is in Givisiez, Switzerland, with branches located around Europe and in the United States, South Africa and India.'), 
+ ('Merida', 'Merida Industry Co., Ltd (MIC; Chinese: 美利達工業) is a Taiwan-based company with R&D headquarters in Germany that designs, manufactures and markets bicycles globally in over 77 countries. Founded in 1972 by Ike Tseng (1932–2012), the company designs and manufactures over 2 million bicycles a year at its factories in Taiwan, China and Germany.'), 
+ ('Orbea', 'Orbea is a bicycle manufacturer based in Mallabia, Spain. It is part of the Mondragón Cooperative Corporation and Spains largest bicycle manufacturer. Orbea manufactures and assembles bikes at their own factory in Mallabia, the other models being made in Portugal and frameset are from China.'), 
+ ('Dorozhnik', 'Dorozhnik is a ukrainian daughter company of Velotrade. Velotrade is world wide famous producer of bikes'), 
+ ('Bergamont', 'Bergamont is a famous German producer of bicycles');
+insert into Countries (Name) values ('Afghanistan'), ( 'Albania'), ('Algeria'), ('American Samoa'), ('Andorra'), ('Angola'), ('Anguilla'), ('Antarctica'), ('Antigua And Barbuda'), ('Argentina'), ('Armenia'), ('Aruba'), ('Australia'), ('Austria'), ('Azerbaijan'), ('Bahamas The'), ('Bahrain'), ('Bangladesh'), ('Barbados'), ('Belarus'), ('Belgium'), ('Belize'), ('Benin'), ('Bermuda'), ('Bhutan'), ('Bolivia'), ('Bosnia and Herzegovina'), ('Botswana'), ('Bouvet Island'), ('Brazil'), ('British Indian Ocean Territory'), ('Brunei'), ('Bulgaria'), ('Burkina Faso'), ('Burundi'), ('Cambodia'), ('Cameroon'), ('Canada'), ('Cape Verde'), ('Cayman Islands'), ('Central African Republic'), ('Chad'), ('Chile'), ('China'), ('Christmas Island'), ('Cocos (Keeling) Islands'), ('Colombia'), ('Comoros'), ('Congo'), ('Congo The Democratic Republic Of The'), ('Cook Islands'), ('Costa Rica'), ('Ivory Coast'), ('Croatia (Hrvatska)'), ('Cuba'), ('Cyprus'), ('Czech Republic'), ('Denmark'), ('Djibouti'), ('Dominica'), ('Dominican Republic'), ('East Timor'), ('Ecuador'), ('Egypt'), ('El Salvador'), ('Equatorial Guinea'), ('Eritrea'), ('Estonia'), ('Ethiopia'), ('External Territories of Australia'), ('Falkland Islands'), ('Faroe Islands'), ('Fiji Islands'), ('Finland'), ('France'), ('French Guiana'), ('French Polynesia'), ('French Southern Territories'), ('Gabon'), ('Gambia The'), ('Georgia'), ('Germany'), ('Ghana'), ('Gibraltar'), ('Greece'), ('Greenland'), ('Grenada'), ('Guadeloupe'), ('Guam'), ('Guatemala'), ('Guernsey and Alderney'), ('Guinea'), ('Guinea-Bissau'), ('Guyana'), ('Haiti'), ('Heard and McDonald Islands'), ('Honduras'), ('Hong Kong S.A.R.'), ('Hungary'), ('Iceland'), ('India'), ('Indonesia'), ('Iran'), ('Iraq'), ('Ireland'), ('Israel'), ('Italy'), ('Jamaica'), ('Japan'), ('Jersey'), ('Jordan'), ('Kazakhstan'), ('Kenya'), ('Kiribati'), ('Korea North'), ('Korea South'), ('Kuwait'), ('Kyrgyzstan'), ('Laos'), ('Latvia'), ('Lebanon'), ('Lesotho'), ('Liberia'), ('Libya'), ('Liechtenstein'), ('Lithuania'), ('Luxembourg'), ('Macau S.A.R.'), ('Macedonia'), ('Madagascar'), ('Malawi'), ('Malaysia'), ('Maldives'), ('Mali'), ('Malta'), ('Man (Isle of)'), ('Marshall Islands'), ('Martinique'), ('Mauritania'), ('Mauritius'), ('Mayotte'), ('Mexico'), ('Micronesia'), ('Moldova'), ('Monaco'), ('Mongolia'), ('Montserrat'), ('Morocco'), ('Mozambique'), ('Myanmar'), ('Namibia'), ('Nauru'), ('Nepal'), ('Netherlands Antilles'), ('Netherlands The'), ('New Caledonia'), ('New Zealand'), ('Nicaragua'), ('Niger'), ('Nigeria'), ('Niue'), ('Norfolk Island'), ('Northern Mariana Islands'), ('Norway'), ('Oman'), ('Pakistan'), ('Palau'), ('Palestinian Territory Occupied'), ('Panama'), ('Papua new Guinea'), ('Paraguay'), ('Peru'), ('Philippines'), ('Pitcairn Island'), ('Poland'), ('Portugal'), ('Puerto Rico'), ('Qatar'), ('Reunion'), ('Romania'), ('Rwanda'), ('Saint Helena'), ('Saint Kitts And Nevis'), ('Saint Lucia'), ('Saint Pierre and Miquelon'), ('Saint Vincent And The Grenadines'), ('Samoa'), ('San Marino'), ('Sao Tome and Principe'), ('Saudi Arabia'), ('Senegal'), ('Serbia'), ('Seychelles'), ('Sierra Leone'), ('Singapore'), ('Slovakia'), ('Slovenia'), ('Smaller Territories of the UK'), ('Solomon Islands'), ('Somalia'), ('South Africa'), ('South Georgia'), ('South Sudan'), ('Spain'), ('Sri Lanka'), ('Sudan'), ('Suriname'), ('Svalbard And Jan Mayen Islands'), ('Swaziland'), ('Sweden'), ('Switzerland'), ('Syria'), ('Taiwan'), ('Tajikistan'), ('Tanzania'), ('Thailand'), ('Togo'), ('Tokelau'), ('Tonga'), ('Trinidad And Tobago'), ('Tunisia'), ('Turkey'), ('Turkmenistan'), ('Turks And Caicos Islands'), ('Tuvalu'), ('Uganda'), ('Ukraine'), ('United Arab Emirates'), ('United Kingdom'), ('United States'), ('United States Minor Outlying Islands'), ('Uruguay'), ('Uzbekistan'), ('Vanuatu'), ('Vatican City State (Holy See)'), ('Venezuela'), ('Vietnam'), ('Virgin Islands (British)'), ('Virgin Islands (US)'), ('Wallis And Futuna Islands'), ('Western Sahara'), ('Yemen'), ('Yugoslavia'), ('Zambia'), ('Zimbabwe');
+insert into Bicycles (Name, WheelDiameter, Price, Quantity, TypeId, ProducerId, CountryId) values 
+ ('Contessa Active 60', 29, 16800, 5, 1, 1, 1),
+ ('Aspect 970', 29, 16975, 5, 1, 1, 1),
+ ('Sub Cross 50', 28, 18375, 5, 2, 1, 1),
+ ('Roxter 26', 26, 18375, 5, 2, 1, 1),
+ ('Corossway 40', 28, 18994, 5, 2, 2, 2),
+ ('Crossway 20-D', 28, 17109, 5, 2, 2, 2),
+ ('Matts 7.20', 27.5, 16877, 5, 1, 2, 2),
+ ('Matts 7.30', 27.5, 18414, 5, 1, 2, 2),
+ ('MX 27 ENT DIRT', 26.0, 17645, 5, 3, 3, 3),
+ ('MX 50', 29, 18393, 5, 1, 3, 3),
+ ('MX 24 XC', 24, 18107, 5, 1, 3, 3),
+ ('MX 20 Team', 20, 14593, 5, 1, 3, 3),
+ ('Lux', 26, 8451, 5, 4, 4, 4),
+ ('Comfort', 28, 5941, 5, 5, 4, 4),
+ ('Topaz', 28, 4851, 5, 6, 4, 4),
+ ('Retro Planetary Hub', 28, 7543, 5, 6, 4, 4),
+ ('Revox', 24, 9900, 5, 1, 5, 5),
+ ('Revox 2', 27.5, 14175, 5, 1, 5, 5),
+ ('Revox 3', 27.5, 17010, 5, 1, 5, 5),
+ ('Revox 4', 29, 18833, 5, 1, 5, 5);
+insert into users (FullName, Phone, Email, Adress, Username, Password, IsAdmin) values 
+ ('admin', 1111, 'admin@gmail.com', 'adress', 'admin', 'admin', true);
