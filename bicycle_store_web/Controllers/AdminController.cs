@@ -21,8 +21,6 @@ namespace bicycle_store_web.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly bicycle_storeContext _db;
-        //private readonly IConfiguration _config;
-        //private readonly TokenService _tokenService;
         private IQueryable bicycles;
 
         [BindProperty]
@@ -45,29 +43,21 @@ namespace bicycle_store_web.Controllers
                 b.Country.Bicycles.Add(b);
             }
         }
-        //private string BuildMessage(string stringToSplit, int chunkSize)
-        //{
-        //    var data = Enumerable.Range(0, stringToSplit.Length / chunkSize).Select(i => stringToSplit.Substring(i * chunkSize, chunkSize));
-        //    string result = "The generated token is:";
-        //    foreach (string str in data)
-        //    {
-        //        result += Environment.NewLine + str;
-        //    }
-        //    return result;
-        //}
-        public AdminController(/*IConfiguration config, TokenService tokenService,*/ ILogger<AdminController> logger, bicycle_storeContext context)
+        public AdminController(ILogger<AdminController> logger, bicycle_storeContext context)
         {
             _logger = logger;
             _db = context;
-                //_tokenService = tokenService;
-                //_config = config;
             AddData();
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Index() => View();
+        [Authorize]
         public IActionResult Bicycles() => View();
+        [Authorize]
         public IActionResult Types() => View();
+        [Authorize]
         public IActionResult Producers() => View();
+        [Authorize]
         public IActionResult Users() => View();
         public IActionResult AdminPanel() => PartialView("AdminPanel");
         public IActionResult _AddBicycle(int? id) 
@@ -121,7 +111,7 @@ namespace bicycle_store_web.Controllers
                 u.Email,
                 u.Adress,
                 u.Username,
-                u.IsAdmin,
+                u.Role,
             }).ToList();
             return Json(new { data = list });
         }
@@ -131,14 +121,14 @@ namespace bicycle_store_web.Controllers
             var user = _db.Users.FirstOrDefault(u => u.Id == Id);
             if (user != null)
             {
-                if (user.IsAdmin == true)
+                if (user.Role == "Admin")
                 {
-                    user.IsAdmin = false;
+                    user.Role = "User";
                     _db.Users.Update(user);
                 }
                 else
                 {
-                    user.IsAdmin = true;
+                    user.Role = "Admin";
                     _db.Users.Update(user);
                 }
                 _db.SaveChanges();

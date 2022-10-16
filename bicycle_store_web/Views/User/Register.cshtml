@@ -1,0 +1,77 @@
+﻿@{Layout = "_LayoutUser";}
+@model bicycle_store_web.User
+
+<h2 class="text-dark text-center">Register</h2>
+<form id="userForm">
+    <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="FullName"></label>
+        </div>
+        <div class="col-8">
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="Phone"></label>
+        </div>
+        <div class="col-8">
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="Email"></label>
+        </div>
+        <div class="col-8">
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="Adress"></label>
+        </div>
+        <div class="col-8">
+            <input asp-for="Adress" class="form-control" />
+            <span asp-validation-for="Adress" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="Username"></label>
+        </div>
+        <div class="col-8">
+            <input asp-for="Username" class="form-control" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-4 text-black-50">
+            <label asp-for="Password"></label>
+        </div>
+        <div class="col-8">
+            <input asp-for="Password" class="form-control"/>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-12  d-flex flex-row">
+            <button type="button" class="btn btn-primary form-control m-1"
+                    onclick="saveObject('/User/SaveUser', '#userForm')">
+                Register
+            </button>
+            <a type="button" class="btn btn-primary form-control m-1" asp-controller="User" asp-action="Index">
+                Close
+            </a>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

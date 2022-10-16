@@ -33,5 +33,6 @@ insert into Bicycles (Name, WheelDiameter, Price, Quantity, TypeId, ProducerId, 
  ('Revox 2', 27.5, 14175, 5, 1, 5, 5),
  ('Revox 3', 27.5, 17010, 5, 1, 5, 5),
  ('Revox 4', 29, 18833, 5, 1, 5, 5);
-insert into users (FullName, Phone, Email, Adress, Username, Password, IsAdmin) values 
- ('admin', 1111, 'admin@gmail.com', 'adress', 'admin', 'admin', true);
+insert into users (FullName, Phone, Email, Adress, Username, Password, Role) values 
+ ('admin', 1111, 'admin@gmail.com', 'adress', 'admin', 'admin', 'Admin'),
+ ('user', 1111, 'user@gmail.com', 'adress', 'user', 'user', 'User');

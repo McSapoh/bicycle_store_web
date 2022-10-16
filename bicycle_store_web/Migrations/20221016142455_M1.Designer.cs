@@ -9,7 +9,7 @@ using bicycle_store_web;
 namespace bicycle_store_web.Migrations
 {
     [DbContext(typeof(bicycle_storeContext))]
-    [Migration("20220926163453_M1")]
+    [Migration("20221016142455_M1")]
     partial class M1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,24 +161,28 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Adress")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")
                         .HasColumnType("longtext");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Phone")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Role")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");

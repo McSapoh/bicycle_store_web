@@ -1,0 +1,42 @@
+﻿@{Layout = "_LayoutUser";}
+@model bicycle_store_web.User
+@{ string returnUrl = ViewData["returnUrl"] as string;}
+
+<div class="d-flex align-items-center justify-content-center" style="min-height: 500px;">
+    <form id="userForm" method="post" action="Login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" class="border p-2" style="background-color: #666e75 ">
+        <h2 class="text-dark text-center">Log In</h2>
+        <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+        <div class="form-group row">
+            <div class="col-4 text-black-50">
+                <label asp-for="Username"></label>
+            </div>
+            <div class="col-8">
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-4 text-black-50">
+                <label asp-for="Password"></label>
+            </div>
+            <div class="col-8">
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+
+        <input type="submit" name="submit" class="btn btn-primary" />
+
+        @*<div class="form-group row">
+        <div class="col-12  d-flex flex-row">
+            <button type="button" class="btn btn-primary form-control m-1"
+                asp-controller="User" asp-action="IsLogin">
+            Log In
+            </button>
+            <button type="button" class="btn btn-primary form-control m-1" data-dismiss="modal">
+                Close
+            </button>
+        </div>
+    </div>*@
+    </form>
+</div>

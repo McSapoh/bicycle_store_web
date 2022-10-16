@@ -76,10 +76,10 @@ function loadUserDataTable(tableId) {
             { data: "adress", width: "12%"},
             { data: "username", width: "12%"},
             {
-                data: { isAdmin: "isAdmin", id: "id"}, bSortable: false, aTargets: [1], render: function (data) {
+                data: { role: "role", id: "id"}, bSortable: false, aTargets: [1], render: function (data) {
                     let input = `<input type="checkbox" OnClick="changePermision('${data.id}')" `
-                    console.log(input)
-                    if (data.isAdmin === true)
+                    console.log(data)
+                    if (data.role == "Admin")
                         return input + `checked>`
                     return input + `>`
                 }, width: "12%",
@@ -146,9 +146,11 @@ function saveObject(url, formId) {
         url: url,
         data: $(formId).serialize(),
         success: function (data) {
-            closePopup()
             if (data.success) {
-                dataTable.ajax.reload();
+                try {
+                    dataTable.ajax.reload();
+                    closePopup();
+                } catch (e) {}
                 toastr.success(data.message);
             }
             else {
@@ -177,8 +179,10 @@ function changePermision(objectId) {
 
 // popup actions
 function closePopup() {
-    $("#PopupPlaceHolder").empty();
-    $('#PopupPlaceHolder').modal('hide')
+    if ($('#PopupPlaceHolder').modal == 'show') {
+        $("#PopupPlaceHolder").empty();
+        $('#PopupPlaceHolder').modal('hide')
+    }
 }
 window.onclick = function (event) {
     if ($('#PopupPlaceHolder').modal == 'show' && event.target == modal) {
@@ -190,7 +194,7 @@ function openPopup(url) {
         type: 'GET',
         url: url,
         success: function (data) {
-            $("#PopupPlaceHolder").html(`<div class="col-md-4 offset-md-4 bg-secondary border container">` + data + `</div>`);
+            $("#PopupPlaceHolder").html(`<div class="col-md-4 offset-md-4 bg-secondary border container ">` + data + `</div>`);
             $("#PopupPlaceHolder").modal('show');
         }
     })
