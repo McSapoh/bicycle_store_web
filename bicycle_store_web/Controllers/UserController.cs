@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using bicycle_store_web.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace bicycle_store_web.Controllers
 {
@@ -14,20 +12,61 @@ namespace bicycle_store_web.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly bicycle_storeContext _db;
+        private readonly UserService userService;
+        private readonly BicycleService bicycleService;
         [BindProperty]
         public User user { get; set; }
         [BindProperty]
-        public List<Claim> claims { get; set; }
+        public Order order { get; set; }
         [BindProperty]
-        public ClaimsIdentity claimsIdentity { get; set; }
-        [BindProperty]
-        public ClaimsPrincipal claimsPrincipal { get; set; }
-        public UserController(ILogger<UserController> logger, bicycle_storeContext context)
+        public IFormFile img { get; set; }
+        public void AddImages()
+        {
+            foreach (User u in _db.Users)
+                SaveUser(u, null);
+            _db.SaveChanges();
+        }
+        public IQueryable<Bicycle> AddData()
+        {
+            var bicycles = _db.Bicycles.AsNoTracking()
+                .Include(t => t.Type)
+                .Include(p => p.Producer)
+                .Include(c => c.Country);
+            foreach (Bicycle b in bicycles)
+            {
+                b.Type.Bicycles.Add(b);
+                b.Producer.Bicycles.Add(b);
+                b.Country.Bicycles.Add(b);
+            }
+            return bicycles;
+        }
+        public UserController(ILogger<UserController> logger, bicycle_storeContext context, 
+            UserService userService, BicycleService bicycleService)
         {
             _logger = logger;
             _db = context;
+            this.userService = userService;
+            this.bicycleService = bicycleService;
+            //AddImages();
         }
-        public IActionResult Index() => View("Index");
+        public IActionResult Index() => View();
+        public IActionResult Bicycles() => View("Bicycles", AddData());
+        public IActionResult SetProfile() 
+        {
+            if (User.Identity.IsAuthenticated)
+                user = _db.Users.FirstOrDefault(u => u.FullName == User.Identity.Name);
+            else
+                user = new User();
+            return View(user);
+        }
+        public IActionResult OrderCreating()
+        {
+            ViewBag.Bicycles = bicycleService.GetBicycleSelectList();
+            order = new Order();
+            var bicycleOrder = new BicycleOrder();
+            order.BicycleOrders.Add(bicycleOrder);
+            return View();
+        }
         public IActionResult Register() {
             user = new User();
             return View("Register", user); 
@@ -46,47 +85,23 @@ namespace bicycle_store_web.Controllers
         [HttpPost("User/Login")]
         public IActionResult IsLogin(string Username, string Password, string ReturnUrl)
         {
-            user = _db.Users.FirstOrDefault(u => u.Username == Username);
+            user = userService.GetUser(Username);
             if(user != null && user.Password == Password)
             {
-                claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, Username));
-                claims.Add(new Claim(ClaimTypes.Name, Username));
-                claims.Add(new Claim(ClaimTypes.Role, user.Role));
-
-                claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                HttpContext.SignInAsync(claimsPrincipal);
+                HttpContext.SignInAsync(userService.GetClaims(user));
+                if ((user.Role == "Admin" || user.Role == "SuperAdmin") && ReturnUrl == null)
+                    return Redirect("/Admin/Index");
                 return Redirect(ReturnUrl ?? "Index");
             }
             return BadRequest();
         }
-        public IActionResult SaveUser()
+        [HttpPost]
+        public IActionResult SaveUser(User user, IFormFile Photo)
         {
             if (ModelState.IsValid)
-            {
-                user.Role = "User";
-                if (user.Id == 0)
-                    _db.Users.Add(user);
-                else
-                    _db.Users.Update(user);
-                _db.SaveChanges();
-                Redirect("Index");
-                return Json(new { success = true, message = "Successfully saved" });
-            }
+                return userService.SaveUser(user, Photo);
             return Json(new { success = false, message = "Error while saving" });
         }
-        public IActionResult DeleteUser(int Id)
-        {
-            var userFromDb = _db.Users.FirstOrDefault(u => u.Id == Id);
-            if (userFromDb == null)
-            {
-                return Json(new { success = false, message = "Error while Deleting" });
-            }
-            _db.Users.Remove(userFromDb);
-            _db.SaveChanges();
-            return Json(new { success = true, message = "Delete successful" });
-        }
+        public IActionResult DeleteUser(int Id) => userService.DeleteUser(Id);
     }
 }

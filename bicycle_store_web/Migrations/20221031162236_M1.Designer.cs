@@ -9,7 +9,7 @@ using bicycle_store_web;
 namespace bicycle_store_web.Migrations
 {
     [DbContext(typeof(bicycle_storeContext))]
-    [Migration("20221016142455_M1")]
+    [Migration("20221031162236_M1")]
     partial class M1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,7 +29,11 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("longblob");
 
                     b.Property<uint>("Price")
                         .HasColumnType("int unsigned");
@@ -63,10 +67,10 @@ namespace bicycle_store_web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("BicyclePrice")
+                    b.Property<int>("BicycleCost")
                         .HasColumnType("int");
 
-                    b.Property<int>("BicyclesId")
+                    b.Property<int>("BicycleId")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderId")
@@ -77,7 +81,7 @@ namespace bicycle_store_web.Migrations
 
                     b.HasKey("BicycleOrderId");
 
-                    b.HasIndex("BicyclesId");
+                    b.HasIndex("BicycleId");
 
                     b.HasIndex("OrderId");
 
@@ -98,13 +102,50 @@ namespace bicycle_store_web.Migrations
                     b.ToTable("Countries");
                 });
 
+            modelBuilder.Entity("bicycle_store_web.Models.ShoppingCart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ShopingCarts");
+                });
+
+            modelBuilder.Entity("bicycle_store_web.Models.ShoppingCartOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("BicycleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BicycleId");
+
+                    b.HasIndex("ShoppingCartId");
+
+                    b.ToTable("ShoppingCartOrders");
+                });
+
             modelBuilder.Entity("bicycle_store_web.Order", b =>
                 {
                     b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClientsId")
                         .HasColumnType("int");
 
                     b.Property<int>("Cost")
@@ -113,9 +154,15 @@ namespace bicycle_store_web.Migrations
                     b.Property<DateTime>("Data")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Status")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("OrderId");
 
-                    b.HasIndex("ClientsId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -165,6 +212,7 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("FullName")
@@ -176,7 +224,11 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("Role")
                         .HasColumnType("longtext");
@@ -221,7 +273,7 @@ namespace bicycle_store_web.Migrations
                 {
                     b.HasOne("bicycle_store_web.Bicycle", "Bicycles")
                         .WithMany("BicycleOrders")
-                        .HasForeignKey("BicyclesId")
+                        .HasForeignKey("BicycleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -236,25 +288,62 @@ namespace bicycle_store_web.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("bicycle_store_web.Order", b =>
+            modelBuilder.Entity("bicycle_store_web.Models.ShoppingCart", b =>
                 {
-                    b.HasOne("bicycle_store_web.User", "Clients")
-                        .WithMany("Orders")
-                        .HasForeignKey("ClientsId")
+                    b.HasOne("bicycle_store_web.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Clients");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("bicycle_store_web.Models.ShoppingCartOrder", b =>
+                {
+                    b.HasOne("bicycle_store_web.Bicycle", "Bicycle")
+                        .WithMany("BicycleCartOrders")
+                        .HasForeignKey("BicycleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("bicycle_store_web.Models.ShoppingCart", "ShoppingCart")
+                        .WithMany("ShoppingCartOrders")
+                        .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bicycle");
+
+                    b.Navigation("ShoppingCart");
+                });
+
+            modelBuilder.Entity("bicycle_store_web.Order", b =>
+                {
+                    b.HasOne("bicycle_store_web.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("bicycle_store_web.Bicycle", b =>
                 {
+                    b.Navigation("BicycleCartOrders");
+
                     b.Navigation("BicycleOrders");
                 });
 
             modelBuilder.Entity("bicycle_store_web.Country", b =>
                 {
                     b.Navigation("Bicycles");
+                });
+
+            modelBuilder.Entity("bicycle_store_web.Models.ShoppingCart", b =>
+                {
+                    b.Navigation("ShoppingCartOrders");
                 });
 
             modelBuilder.Entity("bicycle_store_web.Order", b =>

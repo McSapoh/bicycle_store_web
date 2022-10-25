@@ -1,7 +1,7 @@
 ﻿@model bicycle_store_web.Producer
 
 <h2 class="text-dark text-center">@(Model.Id!=0 ? "Edit" : "Create") Producer</h2>
-<form id="producerForm">
+<form id="producerForm" asp-action="SaveProducer" asp-controller="Admin">
     @if (Model.Id != 0)
     {
         <input type="hidden" asp-for="Id" />
@@ -28,7 +28,7 @@
     <div class="form-group row">
         <div class="col-12  d-flex flex-row">
             <button type="button" class="btn btn-primary form-control m-1"
-                    onclick="saveObject('/Admin/SaveProducer', '#producerForm')">
+                    onclick="saveObject('producerForm')">
                 @(Model.Id != 0 ? "Update" : "Create")
             </button>
             <button type="button" class="btn btn-primary form-control m-1" data-dismiss="modal">

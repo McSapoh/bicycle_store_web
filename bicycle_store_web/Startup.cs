@@ -1,4 +1,5 @@
 using bicycle_store_web.Models;
+using bicycle_store_web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,7 +26,13 @@ namespace bicycle_store_web
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
             services.AddDbContext<bicycle_storeContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), serverVersion));
             services.AddControllersWithViews();
-            services.AddScoped<Bicycle>();
+            services.AddTransient<BicycleService>();
+            services.AddTransient<TypeService>();
+            services.AddTransient<ProducerService>();
+            services.AddTransient<UserService>();
+            services.AddTransient<ShoppingCartService>();
+            services.AddTransient<ShoppingCartOrderService>();
+            services.AddTransient<OrderService>();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => 
                     {

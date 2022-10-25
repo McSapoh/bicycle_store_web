@@ -68,12 +68,13 @@ namespace bicycle_store_web.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     FullName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Phone = table.Column<string>(type: "longtext", nullable: true)
+                    Phone = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "longtext", nullable: true)
+                    Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Adress = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Photo = table.Column<byte[]>(type: "longblob", nullable: true),
                     Username = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Password = table.Column<string>(type: "longtext", nullable: false)
@@ -93,11 +94,12 @@ namespace bicycle_store_web.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "longtext", nullable: true)
+                    Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     WheelDiameter = table.Column<float>(type: "float", nullable: false),
                     Price = table.Column<uint>(type: "int unsigned", nullable: false),
                     Quantity = table.Column<uint>(type: "int unsigned", nullable: false),
+                    Photo = table.Column<byte[]>(type: "longblob", nullable: true),
                     TypeId = table.Column<int>(type: "int", nullable: false),
                     CountryId = table.Column<int>(type: "int", nullable: false),
                     ProducerId = table.Column<int>(type: "int", nullable: false)
@@ -134,14 +136,36 @@ namespace bicycle_store_web.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Cost = table.Column<int>(type: "int", nullable: false),
                     Data = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ClientsId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_Orders_Users_ClientsId",
-                        column: x => x.ClientsId,
+                        name: "FK_Orders_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ShopingCarts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShopingCarts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ShopingCarts_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -154,17 +178,17 @@ namespace bicycle_store_web.Migrations
                 {
                     BicycleOrderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    BicycleId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    BicyclePrice = table.Column<int>(type: "int", nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: false),
-                    BicyclesId = table.Column<int>(type: "int", nullable: false)
+                    BicycleCost = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BicycleOrders", x => x.BicycleOrderId);
                     table.ForeignKey(
-                        name: "FK_BicycleOrders_Bicycles_BicyclesId",
-                        column: x => x.BicyclesId,
+                        name: "FK_BicycleOrders_Bicycles_BicycleId",
+                        column: x => x.BicycleId,
                         principalTable: "Bicycles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -177,10 +201,38 @@ namespace bicycle_store_web.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "ShoppingCartOrders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    BicycleId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    ShoppingCartId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShoppingCartOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ShoppingCartOrders_Bicycles_BicycleId",
+                        column: x => x.BicycleId,
+                        principalTable: "Bicycles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShoppingCartOrders_ShopingCarts_ShoppingCartId",
+                        column: x => x.ShoppingCartId,
+                        principalTable: "ShopingCarts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateIndex(
-                name: "IX_BicycleOrders_BicyclesId",
+                name: "IX_BicycleOrders_BicycleId",
                 table: "BicycleOrders",
-                column: "BicyclesId");
+                column: "BicycleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BicycleOrders_OrderId",
@@ -203,9 +255,24 @@ namespace bicycle_store_web.Migrations
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_ClientsId",
+                name: "IX_Orders_UserId",
                 table: "Orders",
-                column: "ClientsId");
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShopingCarts_UserId",
+                table: "ShopingCarts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShoppingCartOrders_BicycleId",
+                table: "ShoppingCartOrders",
+                column: "BicycleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShoppingCartOrders_ShoppingCartId",
+                table: "ShoppingCartOrders",
+                column: "ShoppingCartId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -214,10 +281,16 @@ namespace bicycle_store_web.Migrations
                 name: "BicycleOrders");
 
             migrationBuilder.DropTable(
-                name: "Bicycles");
+                name: "ShoppingCartOrders");
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Bicycles");
+
+            migrationBuilder.DropTable(
+                name: "ShopingCarts");
 
             migrationBuilder.DropTable(
                 name: "Countries");

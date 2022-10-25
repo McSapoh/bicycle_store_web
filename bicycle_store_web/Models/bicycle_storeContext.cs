@@ -1,4 +1,5 @@
 ﻿using System;
+using bicycle_store_web.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -19,5 +20,7 @@ namespace bicycle_store_web
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<Producer> Producers { get; set; }
         public virtual DbSet<Type> Types { get; set; }
+        public virtual DbSet<ShoppingCart> ShopingCarts { get; set; }
+        public virtual DbSet<ShoppingCartOrder> ShoppingCartOrders { get; set; }
     }
 }

@@ -1,92 +1,129 @@
 ﻿// admin datatables
-function loadBicycleDataTable(tableId) {
-    let controllerUrl = "/Admin/GetBicycles", addUrl = '/Admin/_AddBicycle?id', deleteUrl = '/Admin/DeleteBicycle'
-    loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
-        stripeClasses: [],
+function loadDataTable(tableId, userId) {
+    tId = "#" + tableId
+    let columns, controllerUrl
+    switch (tableId) {
+        case 'BicycleTable':
+            columns = getBicyclesTableColumns()
+            controllerUrl = '/Admin/GetBicycles'
+            break;
+        case 'TypeTable':
+            columns = getTypesTableColumns()
+            controllerUrl = '/Admin/GetTypes'
+            break;
+        case 'ProducerTable':
+            columns = getProducersTableColumns()
+            controllerUrl = '/Admin/GetProducers'
+            break;
+        case 'UserTable':
+            columns = getUsersTableColumns(userId)
+            controllerUrl = '/Admin/GetUsers'
+            break;
+        case 'CartTable':
+            columns = getShoppingCartTableColumns()
+            controllerUrl = '/ShoppingCart/GetShoppingCart'
+            break;
+    }
+    dataTable = $("#" + tableId).DataTable({
         ajax: {
             url: controllerUrl,
             type: "GET",
             datatype: "json"
         },
-        columns: [
-            { data: "name", width: "15%",  },
-            { data: "wheelDiameter", width: "12%"},
-            { data: "price", width: "9%"},
-            { data: "quantity", width: "12%"},
-            { data: "type.name", width: "12%"},
-            { data: "producer.name", width: "12%"},
-            { data: "country.name", width: "12%"},
-            { data: "id", bSortable: false, aTargets: [1],
-                render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
-            }
-        ],
+        columns: columns,
     })
-    console.log(dataTable)
-}
-function loadTypeDataTable(tableId) {
-    let controllerUrl = "/Admin/GetTypes", addUrl = '/Admin/_AddType?id', deleteUrl = '/Admin/DeleteType'
     loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
-        ajax: {
-            url: controllerUrl,
-            type: "GET",
-            datatype: "json"
-        },
-        columns: [
-            { data: "name", width: "30%"},
-            { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1], },
-            { data: "id", 'bSortable': false, 'aTargets': [1],
-                render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
-            }
-        ]
-    });
+    console.log("ended loading table")
+    if (tableId == 'CartTable') {
+        loadCartFooter()
+    }
 }
-function loadProducerDataTable(tableId) {
-    let controllerUrl = "/Admin/GetProducers", addUrl = '/Admin/_AddProducer?id', deleteUrl = '/Admin/DeleteProducer'
-    loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
-        ajax: {
-            url: controllerUrl,
-            type: "GET",
-            datatype: "json"
-        },
-        columns: [
-            { data: "name", width: "30%"},
-            { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1],},
-            { data: "id", 'bSortable': false, 'aTargets': [1],
-                render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
-            }
-        ]
-    });
+
+function getBicyclesTableColumns() {
+    let addUrl = '/Admin/_AddBicycle?id', deleteUrl = '/Admin/DeleteBicycle'
+    return [
+        { data: "name", width: "15%", },
+        { data: "wheelDiameter", width: "12%" },
+        { data: "price", width: "9%" },
+        { data: "quantity", width: "12%" },
+        { data: "type.name", width: "12%" },
+        { data: "producer.name", width: "12%" },
+        { data: "country.name", width: "12%" },
+        {
+            data: "id", bSortable: false, aTargets: [1],
+            render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
+        }
+    ]
 }
-function loadUserDataTable(tableId) {
-    let controllerUrl = "/Admin/GetUsers"
-    loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
-        ajax: {
-            url: controllerUrl,
-            type: "GET",
-            datatype: "json"
+function getTypesTableColumns() {
+    let addUrl = '/Admin/_AddType?id', deleteUrl = '/Admin/DeleteType'
+    return [
+        { data: "name", width: "30%" },
+        { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1], },
+        {
+            data: "id", 'bSortable': false, 'aTargets': [1],
+            render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
+        }
+    ]
+}
+function getProducersTableColumns() {
+    let addUrl = '/Admin/_AddProducer?id', deleteUrl = '/Admin/DeleteProducer'
+    return [
+        { data: "name", width: "30%" },
+        { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1], },
+        {
+            data: "id", 'bSortable': false, 'aTargets': [1],
+            render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
+        }
+    ]
+}
+function getUsersTableColumns(userId) {
+    return [
+        { data: "fullName", width: "15%" },
+        { data: "phone", width: "16%" },
+        { data: "email", width: "17%" },
+        { data: "adress", width: "12%" },
+        { data: "username", width: "12%" },
+        {
+            data: { role: "role", id: "id", userId: userId }, bSortable: false, aTargets: [1], render: function (data) {
+                let input = `<input type="checkbox" OnClick="changePermision('${data.id}')" `
+                if (userId == data.id)
+                    input += `disabled `
+                if (data.role == "Admin")
+                    return input + `checked>`
+                if (data.role == "SuperAdmin")
+                    return input + `checked disabled>`
+                return input + `>`
+            }, width: "4%",
+            className: "dt-body-center"
         },
-        columns: [
-            { data: "fullName", width: "15%"},
-            { data: "phone", width: "12%"},
-            { data: "email", width: "9%"},
-            { data: "adress", width: "12%"},
-            { data: "username", width: "12%"},
-            {
-                data: { role: "role", id: "id"}, bSortable: false, aTargets: [1], render: function (data) {
-                    let input = `<input type="checkbox" OnClick="changePermision('${data.id}')" `
-                    console.log(data)
-                    if (data.role == "Admin")
-                        return input + `checked>`
-                    return input + `>`
-                }, width: "12%",
-                className: "dt-body-center"
-            },
-        ],
-    })
+        {
+            data: { photo: "photo", role: "role" }, bSortable: false, aTargets: [1], render: function (data) {
+                let img = `<img src="data:image/jpeg;base64,` + data.photo + `" style="height: 100px; width: 100px;"/>`
+                return img
+            }, width: "8%"
+        },
+    ]
+}
+function getShoppingCartTableColumns() {
+    return [
+        { data: "name", width: "15%", },
+        { data: "price", width: "9%" },
+        { data: "quantity", width: "12%", bSortable: false, aTargets: [1], },
+        { data: function (data) { return data.price * data.quantity }, width: "12%", },
+        {
+            data: { id: "id"}, bSortable: false, aTargets: [1],
+            render: function (data) {
+                console.log(data.id)
+                return `<div class="text-center">
+                    <a class='btn btn-danger text-white' style='cursor:pointer; width:45%;'
+                        OnClick="removeFromCart('${data.id}')">
+                        Remove
+                    </a>
+                </div>`},
+            width: "40%"
+        }
+    ]
 }
 
 // default datatable settings
@@ -129,8 +166,8 @@ function deleteObj(functionUrl, objectId) {
                 data: { id: objectId },
                 success: function (data) {
                     if (data.success) {
-                        dataTable.ajax.reload();
-                        toastr.success(data.message);                        
+                        $(tId).DataTable().ajax.reload()
+                        toastr.success(data.message);
                     }
                     else {
                         toastr.error(data.message);
@@ -140,22 +177,37 @@ function deleteObj(functionUrl, objectId) {
         }
     });
 }
-function saveObject(url, formId) {
+function saveObject(formId) {
+    let data, contentType, processData
+    try {
+        event.preventDefault();
+        const form = document.getElementById(formId)
+        let formData = new FormData(form)
+        let files = $("#photo")[0].files;
+        formData.append("Photo", files[0]);
+        data = formData
+        processData = false
+        contentType = false
+    } catch (e) {
+        data = $("#" + formId).serialize()
+        processData = true
+        contentType = 'application/x-www-form-urlencoded'
+    }
     $.ajax({
+        processData: processData,
+        contentType: contentType,
         type: 'POST',
-        url: url,
-        data: $(formId).serialize(),
+        url: $("#" + formId).attr("action"),
+        data: data,
         success: function (data) {
-            if (data.success) {
-                try {
-                    dataTable.ajax.reload();
-                    closePopup();
-                } catch (e) {}
-                toastr.success(data.message);
-            }
-            else {
-                toastr.error(data.message);
-            }
+            try {
+                console.log("success")
+                closePopup();
+                console.log("popup closed")
+                $(tId).DataTable().ajax.reload()
+                console.log("dataTable reloaded")
+            } catch (e) { }
+            toastr.success(data.message);
         }
     })
 }
@@ -179,10 +231,8 @@ function changePermision(objectId) {
 
 // popup actions
 function closePopup() {
-    if ($('#PopupPlaceHolder').modal == 'show') {
-        $("#PopupPlaceHolder").empty();
-        $('#PopupPlaceHolder').modal('hide')
-    }
+    $("#PopupPlaceHolder").empty();
+    $('#PopupPlaceHolder').modal('hide')
 }
 window.onclick = function (event) {
     if ($('#PopupPlaceHolder').modal == 'show' && event.target == modal) {
@@ -190,6 +240,7 @@ window.onclick = function (event) {
     }
 }
 function openPopup(url) {
+    //console.log(url)
     $.ajax({
         type: 'GET',
         url: url,
@@ -198,4 +249,90 @@ function openPopup(url) {
             $("#PopupPlaceHolder").modal('show');
         }
     })
+}
+
+// shopping cart actions
+function addToCart(bicycleId) {
+    $.ajax({
+        type: 'POST',
+        url: '/ShoppingCart/AddToShoppingCart',
+        data: { BicycleId: bicycleId },
+        success: function (data) {
+            if (data.success) {
+                toastr.success(data.message);
+            }
+            else {
+                toastr.error(data.message);
+            }
+        }
+    })
+}
+function removeFromCart(bicycleId) {
+    $.ajax({
+        type: 'POST',
+        url: '/ShoppingCart/RemoveFromShoppingCart',
+        data: { BicycleId: bicycleId },
+        success: function (data) {
+            if (data.success) {
+                $('#CartTable').DataTable().ajax.reload()
+                toastr.success(data.message);
+                getTotalCount('total')
+            }
+            else {
+                toastr.error(data.message);
+            }            
+        }
+    })
+}
+function getTotalCount() {
+    let cellId = '#total'
+    let table = document.getElementById('CartTable')
+    let totalCount = 0
+    for (let i = 1; i < table.rows.length-1; i++) {
+        totalCount += Number(table.rows[i].cells[3].innerText)
+    }
+    $(cellId).html(totalCount)
+}
+function loadCartFooter() {
+    $('#CartTable').append(
+        `<tfoot>
+            <tr>
+                <th class="border-0"></th>
+                <th class="border-0"></th>
+                <th class="border-0">
+                    <a class='btn btn-success text-white' style='cursor:pointer; width:45%;'
+                        OnClick="createOrder()">
+                        Buy
+                    </a>
+                </th>
+                <th class="border-0 ">Total price</th>
+                <th id="total" class="border-0 col-4"></th>
+            </tr>
+        </tfoot>`
+    )
+}
+function createOrder() {
+    swal({
+        title: "Are you sure that you want to buy all theese goods?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true
+    }).then((willDelete) => {
+        if (willDelete) {
+            $.ajax({
+                url: '/Order/CreateOrder',
+                type: "POST",
+                datatype: "json",
+                success: function (data) {
+                    if (data.success) {
+                        $(tId).DataTable().ajax.reload()
+                        toastr.success(data.message);
+                    }
+                    else {
+                        toastr.error(data.message);
+                    }
+                }
+            });
+        }
+    });
 }

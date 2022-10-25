@@ -15,9 +15,10 @@ namespace bicycle_store_web
         public int OrderId { get; set; }
         public int Cost { get; set; }
         public DateTime Data { get; set; }
-        public int ClientsId { get; set; }
+        public int UserId { get; set; }
+        public string Status { get; set; }
 
-        public virtual User Clients { get; set; }
+        public virtual User User { get; set; }
         public virtual ICollection<BicycleOrder> BicycleOrders { get; set; }
     }
 }

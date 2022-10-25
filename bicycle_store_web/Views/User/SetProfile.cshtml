@@ -2,10 +2,12 @@
 
 @model bicycle_store_web.User
 
-<div class="d-flex align-items-center justify-content-center" style="min-height: 500px;">
+<div class="d-flex justify-content-center">
     <form enctype="multipart/form-data" id="userForm" asp-action="SaveUser" asp-controller="User" class="border p-2 text-center" style="background-color: #666e75" method="post">
-        <h2 class="text-dark text-center">Register</h2>
+        <h2 class="text-dark text-center">@(User.Identity.IsAuthenticated ? "Change Your account" : "Register")</h2>
         <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+        <input hidden asp-for="Id" />
+        <input hidden asp-for="Role" />
         <div class="form-group row">
             <div class="col-4 text-black-50">
                 <label asp-for="FullName"></label>
@@ -20,7 +22,7 @@
                 <label asp-for="Phone"></label>
             </div>
             <div class="col-8">
-                <input asp-for="Phone" class="form-control" />
+                <input type="number" asp-for="Phone" class="form-control" />
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
         </div>
@@ -47,8 +49,7 @@
                 <label asp-for="Photo"></label>
             </div>
             <div class="col-8">
-                <input type="file" asp-for="Photo" id="photo" />
-                @*<span asp-validation-for="Photo" class="text-danger"></span>*@
+                <input type="file" asp-for="Photo" id="photo" accept=".png, .jpg, .jpeg" />
             </div>
         </div>
         <div class="form-group row">
@@ -69,14 +70,12 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
         </div>
-        <a class="text-dark" asp-controller="User" asp-action="Login">Already have account? Log in?</a>
         <div class="form-group row">
             <div class="col-12  d-flex flex-row">
-                @*<button type="button" class="btn btn-primary form-control m-1"
-                            onclick="saveObject('/User/SaveUser', '#userForm')">
-                        Register
-                    </button>*@
-                <button type="submit" class="btn btn-primary form-control m-1">Register</button>
+                <button type="button" class="btn btn-primary form-control m-1"
+                        onclick="saveObject('userForm')">
+                    @(User.Identity.IsAuthenticated ? "Confirm changes" : "Register")
+                </button>
                 <a type="button" class="btn btn-primary form-control m-1" asp-controller="User" asp-action="Index">
                     Close
                 </a>
