@@ -4,16 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace bicycle_store_web.Controllers
 {
@@ -29,7 +25,12 @@ namespace bicycle_store_web.Controllers
         public Type type { get; set; }
         [BindProperty]
         public Producer producer { get; set; }
-
+        public void AddImages ()
+        {
+            foreach (Bicycle b in _db.Bicycles)
+                SaveBicycle(b, null);
+            _db.SaveChanges();
+        }
         public void AddData()
         {
             bicycles = _db.Bicycles.AsNoTracking()
@@ -48,27 +49,36 @@ namespace bicycle_store_web.Controllers
             _logger = logger;
             _db = context;
             AddData();
+            //AddImages();
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Index() => View();
-        [Authorize]
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Bicycles() => View();
-        [Authorize]
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Types() => View();
-        [Authorize]
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Producers() => View();
-        [Authorize]
-        public IActionResult Users() => View();
-        public IActionResult AdminPanel() => PartialView("AdminPanel");
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public IActionResult Users() 
+        {
+
+            var user = _db.Users.FirstOrDefault(u => u.Username == HttpContext.User.Identity.Name);
+            ViewBag.Id = user.Id;
+            return View();
+        }
+        public IActionResult _AdminPanel() => PartialView("AdminPanel");
         public IActionResult _AddBicycle(int? id) 
         {
             bicycle = new Bicycle();
-            List<Type> type = _db.Types.ToList();
-            ViewBag.Type = new SelectList(type, "Id", "Name");
-            List<Country> country = _db.Countries.ToList();
-            ViewBag.Country = new SelectList(country, "Id", "Name");
-            List<Producer> producer = _db.Producers.ToList();
-            ViewBag.Producer = new SelectList(producer, "Id", "Name");
+            bicycle.Photo = Properties.Resources.bicycle;
+            ViewBag.Type = new SelectList(_db.Types.ToList(), "Id", "Name");
+            ViewBag.Country = new SelectList(_db.Countries.ToList(), "Id", "Name");
+            ViewBag.Producer = new SelectList(_db.Producers.ToList(), "Id", "Name");
             if (id == null)
                 return PartialView("_AddBicycle", bicycle);
             bicycle = _db.Bicycles.FirstOrDefault(b => b.Id == id);
@@ -112,6 +122,7 @@ namespace bicycle_store_web.Controllers
                 u.Adress,
                 u.Username,
                 u.Role,
+                u.Photo
             }).ToList();
             return Json(new { data = list });
         }
@@ -119,15 +130,27 @@ namespace bicycle_store_web.Controllers
         public IActionResult ChangePermisions(int Id)
         {
             var user = _db.Users.FirstOrDefault(u => u.Id == Id);
+            if (user.Photo == null)
+                user.Photo = Properties.Resources.admin;
             if (user != null)
             {
-                if (user.Role == "Admin")
+                if (user.Role == "SuperAdmin")
                 {
+                    if (user.Photo == null)
+                        user.Photo = Properties.Resources.admin;
+                    _db.Users.Update(user);
+                }
+                else if (user.Role == "Admin")
+                {
+                    if (user.Photo.SequenceEqual(Properties.Resources.admin))
+                        user.Photo = Properties.Resources.user;
                     user.Role = "User";
                     _db.Users.Update(user);
                 }
                 else
                 {
+                    if (user.Photo.SequenceEqual(Properties.Resources.user))
+                        user.Photo = Properties.Resources.admin;
                     user.Role = "Admin";
                     _db.Users.Update(user);
                 }
@@ -163,16 +186,28 @@ namespace bicycle_store_web.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveBicycle()
+        public IActionResult SaveBicycle(Bicycle bicycle, IFormFile Photo)
         {
             if (ModelState.IsValid)
             {
+                if (Photo == null)
+                    bicycle.Photo = Properties.Resources.bicycle;
+                else
+                {
+                    using (var fs1 = Photo.OpenReadStream())
+                    using (var ms1 = new MemoryStream())
+                    {
+                        fs1.CopyTo(ms1);
+                        bicycle.Photo = ms1.ToArray();
+                    }
+                }
+
                 if (bicycle.Id == 0)
                     _db.Bicycles.Add(bicycle);
                 else
                     _db.Bicycles.Update(bicycle);
                 _db.SaveChanges();
-                return Json(new { success = true, message = "Successfully saves" });
+                return Json(new { success = true, message = "Successfully saved" });
             }
             return Json(new { success = false, message = "Error while saving" });
         }
@@ -250,58 +285,6 @@ namespace bicycle_store_web.Controllers
             return Json(new { success = false, message = "Error while saving" });
         }
         #endregion
-
-        //private string generatedToken = null;
-
-        //[AllowAnonymous]
-        //[Route("login")]
-        //[HttpPost]
-        //public IActionResult Login(User user)
-        //{
-        //    if (string.IsNullOrEmpty(user.FullName) || string.IsNullOrEmpty(user.Password))
-        //    {
-        //        return (RedirectToAction("Error"));
-        //    }
-        //    IActionResult response = Unauthorized();
-        //    var validUser = user;
-
-        //    if (validUser != null)
-        //    {
-        //        generatedToken = _tokenService.BuildToken(_config["Jwt:Key"].ToString(), _config["Jwt:Issuer"].ToString(), validUser);
-        //        if (generatedToken != null)
-        //        {
-        //            HttpContext.Session.SetString("Token", generatedToken);
-        //            return RedirectToAction("MainWindow");
-        //        }
-        //        else
-        //        {
-        //            return (RedirectToAction("Error"));
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return (RedirectToAction("Error"));
-        //    }
-        //}
-
-        //[Authorize]
-        //[Route("mainwindow")]
-        //[HttpGet]
-        //public IActionResult MainWindow()
-        //{
-        //    string token = HttpContext.Session.GetString("Token");
-        //    if (token == null)
-        //    {
-        //        return (RedirectToAction("Index"));
-        //    }
-        //    if (!_tokenService.IsTokenValid(_config["Jwt:Key"].ToString(), _config["Jwt:Issuer"].ToString(), token))
-        //    {
-        //        return (RedirectToAction("Index"));
-        //    }
-        //    ViewBag.Message = BuildMessage(token, 50);
-        //    return View();
-        //}
-
     }
 }
 

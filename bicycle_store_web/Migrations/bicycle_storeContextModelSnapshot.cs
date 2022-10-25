@@ -27,7 +27,11 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("longblob");
 
                     b.Property<uint>("Price")
                         .HasColumnType("int unsigned");
@@ -61,7 +65,7 @@ namespace bicycle_store_web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("BicyclePrice")
+                    b.Property<int>("BicycleCost")
                         .HasColumnType("int");
 
                     b.Property<int>("BicyclesId")
@@ -163,6 +167,7 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("FullName")
@@ -174,7 +179,11 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("Role")
                         .HasColumnType("longtext");

@@ -1,92 +1,101 @@
 ﻿// admin datatables
-function loadBicycleDataTable(tableId) {
-    let controllerUrl = "/Admin/GetBicycles", addUrl = '/Admin/_AddBicycle?id', deleteUrl = '/Admin/DeleteBicycle'
-    loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
+function loadDataTable(tableId, userId) {
+    let columns, controllerUrl
+    switch (tableId) {
+        case 'BicycleTable':
+            columns = getBicyclesTableColumns()
+            controllerUrl = '/Admin/GetBicycles'
+            break;
+        case 'TypeTable':
+            columns = getTypesTableColumns()
+            controllerUrl = '/Admin/GetTypes'
+            break;
+        case 'ProducerTable':
+            columns = getProducersTableColumns()
+            controllerUrl = '/Admin/GetProducers'
+            break;
+        case 'UserTable':
+            columns = getUsersTableColumns(userId)
+            controllerUrl = '/Admin/GetUsers'
+            break;
+    }
+    dataTable = $("#" + tableId).DataTable({
         stripeClasses: [],
         ajax: {
             url: controllerUrl,
             type: "GET",
             datatype: "json"
         },
-        columns: [
-            { data: "name", width: "15%",  },
-            { data: "wheelDiameter", width: "12%"},
-            { data: "price", width: "9%"},
-            { data: "quantity", width: "12%"},
-            { data: "type.name", width: "12%"},
-            { data: "producer.name", width: "12%"},
-            { data: "country.name", width: "12%"},
-            { data: "id", bSortable: false, aTargets: [1],
-                render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
-            }
-        ],
+        columns: columns,
     })
-    console.log(dataTable)
+    loadDefaultAdminTableSettings()
 }
-function loadTypeDataTable(tableId) {
-    let controllerUrl = "/Admin/GetTypes", addUrl = '/Admin/_AddType?id', deleteUrl = '/Admin/DeleteType'
-    loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
-        ajax: {
-            url: controllerUrl,
-            type: "GET",
-            datatype: "json"
-        },
-        columns: [
-            { data: "name", width: "30%"},
-            { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1], },
-            { data: "id", 'bSortable': false, 'aTargets': [1],
-                render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
-            }
-        ]
-    });
+
+function getBicyclesTableColumns() {
+    let addUrl = '/Admin/_AddBicycle?id', deleteUrl = '/Admin/DeleteBicycle'
+    return [
+        { data: "name", width: "15%", },
+        { data: "wheelDiameter", width: "12%" },
+        { data: "price", width: "9%" },
+        { data: "quantity", width: "12%" },
+        { data: "type.name", width: "12%" },
+        { data: "producer.name", width: "12%" },
+        { data: "country.name", width: "12%" },
+        {
+            data: "id", bSortable: false, aTargets: [1],
+            render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
+        }
+    ]
 }
-function loadProducerDataTable(tableId) {
-    let controllerUrl = "/Admin/GetProducers", addUrl = '/Admin/_AddProducer?id', deleteUrl = '/Admin/DeleteProducer'
-    loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
-        ajax: {
-            url: controllerUrl,
-            type: "GET",
-            datatype: "json"
-        },
-        columns: [
-            { data: "name", width: "30%"},
-            { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1],},
-            { data: "id", 'bSortable': false, 'aTargets': [1],
-                render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
-            }
-        ]
-    });
+function getTypesTableColumns() {
+    let addUrl = '/Admin/_AddType?id', deleteUrl = '/Admin/DeleteType'
+    return [
+        { data: "name", width: "30%" },
+        { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1], },
+        {
+            data: "id", 'bSortable': false, 'aTargets': [1],
+            render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
+        }
+    ]
 }
-function loadUserDataTable(tableId) {
-    let controllerUrl = "/Admin/GetUsers"
-    loadDefaultDataTableSettings()
-    dataTable = $(tableId).DataTable({
-        ajax: {
-            url: controllerUrl,
-            type: "GET",
-            datatype: "json"
+function getProducersTableColumns() {
+    let addUrl = '/Admin/_AddProducer?id', deleteUrl = '/Admin/DeleteProducer'
+    return [
+        { data: "name", width: "30%" },
+        { data: "description", width: "40%", 'bSortable': false, 'aTargets': [1], },
+        {
+            data: "id", 'bSortable': false, 'aTargets': [1],
+            render: function (data) { return loadAdminTableButtons(addUrl, deleteUrl, data) }, width: "40%"
+        }
+    ]
+}
+function getUsersTableColumns(userId) {
+    return [
+        { data: "fullName", width: "15%" },
+        { data: "phone", width: "16%" },
+        { data: "email", width: "17%" },
+        { data: "adress", width: "12%" },
+        { data: "username", width: "12%" },
+        {
+            data: { role: "role", id: "id", userId: userId }, bSortable: false, aTargets: [1], render: function (data) {
+                let input = `<input type="checkbox" OnClick="changePermision('${data.id}')" `
+                if (userId == data.id)
+                    input += `disabled `
+                if (data.role == "Admin")
+                    return input + `checked>`
+                if (data.role == "SuperAdmin")
+                    return input + `checked disabled>`
+                return input + `>`
+            }, width: "4%",
+            className: "dt-body-center"
         },
-        columns: [
-            { data: "fullName", width: "15%"},
-            { data: "phone", width: "12%"},
-            { data: "email", width: "9%"},
-            { data: "adress", width: "12%"},
-            { data: "username", width: "12%"},
-            {
-                data: { role: "role", id: "id"}, bSortable: false, aTargets: [1], render: function (data) {
-                    let input = `<input type="checkbox" OnClick="changePermision('${data.id}')" `
-                    console.log(data)
-                    if (data.role == "Admin")
-                        return input + `checked>`
-                    return input + `>`
-                }, width: "12%",
-                className: "dt-body-center"
-            },
-        ],
-    })
+        {
+            data: { photo: "photo", role: "role" }, bSortable: false, aTargets: [1], render: function (data) {
+                let img = `<img src="data:image/jpeg;base64,` + data.photo + `" style="height: 100px; width: 100px;"/>`
+                return img
+            }, width: "8%"
+        },
+    ]
 }
 
 // default datatable settings
@@ -103,7 +112,7 @@ function loadAdminTableButtons(addUrl, deleteUrl, objId) {
                 </a>
             </div>`
 }
-function loadDefaultDataTableSettings() {
+function loadDefaultAdminTableSettings() {
     dataTable = {
         retrieve: true,
         paging: false,
@@ -140,11 +149,28 @@ function deleteObj(functionUrl, objectId) {
         }
     });
 }
-function saveObject(url, formId) {
+function saveObject(formId) {
+    let data, contentType, processData
+    try {
+        event.preventDefault();
+        const form = document.getElementById(formId)
+        let formData = new FormData(form)
+        let files = $("#photo")[0].files;
+        formData.append("Photo", files[0]);
+        data = formData
+        processData = false
+        contentType = false
+    } catch (e) {
+        data = $("#" + formId).serialize()
+        processData = true
+        contentType = 'application/x-www-form-urlencoded'
+    }
     $.ajax({
+        processData: processData,
+        contentType: contentType,
         type: 'POST',
-        url: url,
-        data: $(formId).serialize(),
+        url: $("#" +formId).attr("action"),
+        data: data,
         success: function (data) {
             if (data.success) {
                 try {
@@ -179,10 +205,8 @@ function changePermision(objectId) {
 
 // popup actions
 function closePopup() {
-    if ($('#PopupPlaceHolder').modal == 'show') {
-        $("#PopupPlaceHolder").empty();
-        $('#PopupPlaceHolder').modal('hide')
-    }
+    $("#PopupPlaceHolder").empty();
+    $('#PopupPlaceHolder').modal('hide')
 }
 window.onclick = function (event) {
     if ($('#PopupPlaceHolder').modal == 'show' && event.target == modal) {
@@ -190,6 +214,7 @@ window.onclick = function (event) {
     }
 }
 function openPopup(url) {
+    console.log(url)
     $.ajax({
         type: 'GET',
         url: url,

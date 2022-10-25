@@ -80,3 +80,23 @@ table tr:nth-child(odd) {
 TD, TH {
     background-color: #6C757D;
 }
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 140px;
+    z-index: 1;
+}
+
+.dropdown-content a:hover {
+    background-color: #666e75;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}

@@ -9,7 +9,7 @@ using bicycle_store_web;
 namespace bicycle_store_web.Migrations
 {
     [DbContext(typeof(bicycle_storeContext))]
-    [Migration("20221016142455_M1")]
+    [Migration("20221020205857_M1")]
     partial class M1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,7 +29,11 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("longblob");
 
                     b.Property<uint>("Price")
                         .HasColumnType("int unsigned");
@@ -63,7 +67,7 @@ namespace bicycle_store_web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("BicyclePrice")
+                    b.Property<int>("BicycleCost")
                         .HasColumnType("int");
 
                     b.Property<int>("BicyclesId")
@@ -165,6 +169,7 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("FullName")
@@ -176,7 +181,11 @@ namespace bicycle_store_web.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("Role")
                         .HasColumnType("longtext");

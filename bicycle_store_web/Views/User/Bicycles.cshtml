@@ -1,0 +1,39 @@
+﻿@{Layout = "_Layout";}
+@model IQueryable<Bicycle>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="text-dark">Bicycle List</h2>
+        </div>
+        <div class="col-md-4 contaiten-fluid">
+            @{
+                if (User.Identity.IsAuthenticated)
+                {
+                    <a type="button" class="btn btn-dark form-control text-white" 
+                            asp-area="" asp-controller="User" asp-action="OrderCreating">
+                        Create an order
+                    </a>
+                }
+            }
+
+        </div>
+    </div>
+<div class="row border" style="background-color: #666e75">
+    
+    @{
+        foreach (Bicycle bicycle in Model)
+        {
+        <div class="col-lg-4 text-black-50" @*style="min-width: 280px; max-width: 290px;"*@>
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(bicycle.Photo)"
+                 style="height: 250px; width: 250px" />
+            <h2 class="text-white">@bicycle.Name</h2>
+            <p>Діаметр коліс @bicycle.WheelDiameter</p>
+            <p>Тип @bicycle.Type.Name</p>
+            <p>Виробник @bicycle.Producer.Name</p>
+            <p>Країна @bicycle.Country.Name</p>
+            <p>Ціна @bicycle.Price&#8372</p>
+        </div>
+        }
+    }
+</div>
+<div id="PopupPlaceHolder" class="modal"></div>
