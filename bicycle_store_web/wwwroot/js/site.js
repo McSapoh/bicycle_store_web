@@ -140,7 +140,7 @@ function loadAdminTableButtons(addUrl, deleteUrl, objId) {
                 </a>
             </div>`
 }
-function loadDefaultDataTableSettings() {
+function loadDefaultAdminTableSettings() {
     dataTable = {
         retrieve: true,
         paging: false,

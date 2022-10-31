@@ -33,10 +33,7 @@ namespace bicycle_store_web.Controllers
         public void AddImages ()
         {
             foreach (Bicycle b in _db.Bicycles)
-            {
-                //if(b.Id == 10)
-                    SaveBicycle(b, null);
-            }
+                SaveBicycle(b, null);
             _db.SaveChanges();
         }
         public void AddData()
@@ -139,7 +136,14 @@ namespace bicycle_store_web.Controllers
         public IActionResult SaveBicycle(Bicycle bicycle, IFormFile Photo)
         {
             if (ModelState.IsValid)
-                return bicycleService.SaveBicycle(bicycle, Photo);
+            {
+                if (bicycle.Id == 0)
+                    _db.Bicycles.Add(bicycle);
+                else
+                    _db.Bicycles.Update(bicycle);
+                _db.SaveChanges();
+                return Json(new { success = true, message = "Successfully saves" });
+            }
             return Json(new { success = false, message = "Error while saving" });
         }
         [HttpGet]
