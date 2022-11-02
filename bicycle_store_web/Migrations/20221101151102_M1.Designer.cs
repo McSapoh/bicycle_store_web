@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bicycle_store_web;
 
 namespace bicycle_store_web.Migrations
 {
     [DbContext(typeof(bicycle_storeContext))]
-    partial class bicycle_storeContextModelSnapshot : ModelSnapshot
+    [Migration("20221101151102_M1")]
+    partial class M1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -13,7 +13,7 @@ namespace bicycle_store_web
         public int BicycleCost { get; set; }
         public int OrderId { get; set; }        
 
-        public virtual Bicycle Bicycles { get; set; }
+        public virtual Bicycle Bicycle { get; set; }
         public virtual Order Order { get; set; }
     }
 }

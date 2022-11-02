@@ -2,6 +2,7 @@
 using bicycle_store_web.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,6 +32,56 @@ namespace bicycle_store_web.Services
             this.WebHostEnvironment = WebHostEnvironment;
             _db = context;
         }
+        public Order GetOrder(int OrderId) => _db.Orders.FirstOrDefault(o => o.OrderId == OrderId);
+        public IActionResult GetUserOrders(int UserId)
+        {
+            var UserOrders = _db.Orders.Where(o => o.UserId == UserId).ToList();
+            var UserBicycleOrders = new List<BicycleOrder>();
+            foreach (var userOrder in UserOrders)
+            {
+                var bicycleOrders = _db.BicycleOrders.Include(b => b.Bicycle)
+                    .Where(bo => bo.OrderId == userOrder.OrderId).ToList();
+                foreach (var bicycleOrder in bicycleOrders)
+                {
+                    UserBicycleOrders.Add(bicycleOrder);
+                }
+            }
+            var ResultList = UserBicycleOrders.Select(o => new
+            {
+                o.OrderId,
+                o.Bicycle.Name,
+                o.Quantity,
+                o.BicycleCost,
+                o.Order.Status,
+                o.Order.UserId,
+            }).ToList();
+            return new JsonResult(new { data = ResultList });
+        }
+        public IActionResult GetAdminOrders()
+        {
+            var UserOrders = _db.Orders.Include(o => o.User).ToList();
+            var UserBicycleOrders = new List<BicycleOrder>();
+            foreach (var userOrder in UserOrders)
+            {
+                var bicycleOrders = _db.BicycleOrders.Include(b => b.Bicycle)
+                    .Where(bo => bo.OrderId == userOrder.OrderId).ToList();
+                foreach (var bicycleOrder in bicycleOrders)
+                {
+                    UserBicycleOrders.Add(bicycleOrder);
+                }
+            }
+            var ResultList = UserBicycleOrders.Select(o => new
+            {
+                o.OrderId,
+                o.Bicycle.Name,
+                o.Quantity,
+                o.BicycleCost,
+                o.Order.Status,
+                o.Order.User.FullName
+            }).ToList();
+
+            return new JsonResult(new { data = ResultList });
+        }
         public int GetTotalCost(List<ShoppingCartOrder> CartOrders)
         {
             int TotalCost = 0;
@@ -51,7 +102,7 @@ namespace bicycle_store_web.Services
             };
             try
             {
-                Order.OrderId = _db.Orders.Max(o => o.OrderId);
+                Order.OrderId = _db.Orders.Max(o => o.OrderId) + 1;
             }
             catch (Exception)
             {
@@ -60,6 +111,9 @@ namespace bicycle_store_web.Services
             _db.Orders.Add(Order);
             foreach (var CartOrder in CartOrders)
             {
+                var bicycle = bicycleService.GetBicycle(CartOrder.BicycleId);
+                bicycle.Quantity -= (uint)CartOrder.Quantity;
+                _db.Bicycles.Update(bicycle);
                 _db.BicycleOrders.Add(new BicycleOrder()
                 {
                     BicycleId = CartOrder.BicycleId,
@@ -70,7 +124,23 @@ namespace bicycle_store_web.Services
             }
             shoppingCartService.ClearShoppingCart(UserId);
             _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Іuccessfully purchased" });
+            return new JsonResult(new { success = true, message = "Successfully purchased" });
+        }
+        public IActionResult SendOrder(int OrderId)
+        {
+            var order = GetOrder(OrderId);
+            order.Status = OrderStatus.Sended.ToString();
+            _db.Orders.Update(order);
+            _db.SaveChanges();
+            return new JsonResult(new { success = true, message = "Successfully sended" });
+        }
+        public IActionResult ConfirmReceipt(int OrderId)
+        {
+            var order = GetOrder(OrderId);
+            order.Status = OrderStatus.Received.ToString();
+            _db.Orders.Update(order);
+            _db.SaveChanges();
+            return new JsonResult(new { success = true, message = "Successfully sended" });
         }
     }
 }

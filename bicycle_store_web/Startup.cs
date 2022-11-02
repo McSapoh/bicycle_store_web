@@ -24,15 +24,16 @@ namespace bicycle_store_web
         public void ConfigureServices(IServiceCollection services)
         {
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
-            services.AddDbContext<bicycle_storeContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), serverVersion));
+            services.AddDbContext<bicycle_storeContext>(options => 
+                options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), serverVersion));
             services.AddControllersWithViews();
-            services.AddTransient<BicycleService>();
-            services.AddTransient<TypeService>();
-            services.AddTransient<ProducerService>();
-            services.AddTransient<UserService>();
-            services.AddTransient<ShoppingCartService>();
-            services.AddTransient<ShoppingCartOrderService>();
-            services.AddTransient<OrderService>();
+            services.AddScoped<BicycleService>();
+            services.AddScoped<TypeService>();
+            services.AddScoped<ProducerService>();
+            services.AddScoped<UserService>();
+            services.AddScoped<ShoppingCartService>();
+            services.AddScoped<ShoppingCartOrderService>();
+            services.AddScoped<OrderService>();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => 
                     {
@@ -52,7 +53,8 @@ namespace bicycle_store_web
             else
             {
                 app.UseExceptionHandler("/Admin/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see
+                // https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 

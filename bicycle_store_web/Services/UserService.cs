@@ -27,6 +27,9 @@ namespace bicycle_store_web.Services
         [HttpGet]
         public int GetUserId(string Username) => _db.Users.FirstOrDefault(u => u.Username == Username).Id;
         [HttpGet]
+        public string GetUserRole(int UserId) => 
+            _db.Users.FirstOrDefault(u => u.Id == UserId).Role.ToString();
+        [HttpGet]
         public User GetUser(string Username) => _db.Users.FirstOrDefault(u => u.Username == Username);
         [HttpGet]
         public IActionResult GetUsers()

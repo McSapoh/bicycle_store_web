@@ -103,5 +103,13 @@ namespace bicycle_store_web.Controllers
             return Json(new { success = false, message = "Error while saving" });
         }
         public IActionResult DeleteUser(int Id) => userService.DeleteUser(Id);
+        public IActionResult GetUserRole() => Json(new
+        {
+            data = userService.GetUserRole(userService.GetUserId(User.Identity.Name))
+        });
+        public IActionResult GetUserId() => Json(new
+        {
+            data = userService.GetUserId(User.Identity.Name)
+        });
     }
 }

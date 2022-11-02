@@ -1,6 +1,7 @@
 ﻿using bicycle_store_web.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace bicycle_store_web.Services
         public void ClearShoppingCart(int UserId)
         {
             var CartId = GetShoppingCartId(UserId);
-            var cartOrders = shoppingCartOrderService.GetListShoppingCartOrders(CartId);
+            var cartOrders = _db.ShoppingCartOrders.AsNoTracking().Where(o => o.ShoppingCartId == CartId).ToList();
             foreach (var cartOrder in cartOrders)
             {
                 _db.ShoppingCartOrders.Remove(cartOrder);

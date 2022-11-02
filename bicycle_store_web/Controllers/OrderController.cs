@@ -24,11 +24,20 @@ namespace bicycle_store_web.Controllers
             this.userService = userService;
             this.orderService = orderService;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult UserOrders() => View();
+        public IActionResult AdminOrders() => View();
+        [HttpGet]
+        public IActionResult GetAdminOrders() =>
+            orderService.GetAdminOrders();
+        [HttpGet]
+        public IActionResult GetUserOrders() => 
+            orderService.GetUserOrders(userService.GetUserId(User.Identity.Name));
         [HttpPost]
-        public IActionResult CreateOrder() => orderService.CreateOrder(userService.GetUserId(User.Identity.Name));
+        public IActionResult CreateOrder() => 
+            orderService.CreateOrder(userService.GetUserId(User.Identity.Name));
+        [HttpPost]
+        public IActionResult SendOrder(int OrderId) => orderService.SendOrder(OrderId);
+        [HttpPost]
+        public IActionResult ConfirmReceipt(int OrderId) => orderService.ConfirmReceipt(OrderId);
     }
 }

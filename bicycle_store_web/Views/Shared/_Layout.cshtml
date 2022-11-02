@@ -42,6 +42,9 @@
                                     <li>
                                         <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="Logout">Log out</a>
                                     </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Order" asp-action="UserOrders">Orders</a>
+                                    </li>
                                 </ul>
                             </li>
                         }
@@ -74,6 +77,9 @@
                             <a class="nav-link text-white" asp-area="" asp-controller="Admin" asp-action="Producers">Producers</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Order" asp-action="AdminOrders">Orders</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Admin" asp-action="Users">Users</a>
                         </li>
                     </ul>
@@ -98,7 +104,8 @@
             &copy; 2022 - Bicycle Store -
         </div>
     </footer>
-
+    @*<script src="/path/to/cdn/jquery.slim.min.js"></script>
+    <script src="/path/to/dist/row-merge-bundle.min.js"></script>*@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

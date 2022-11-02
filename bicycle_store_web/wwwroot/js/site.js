@@ -23,6 +23,14 @@ function loadDataTable(tableId, userId) {
             columns = getShoppingCartTableColumns()
             controllerUrl = '/ShoppingCart/GetShoppingCart'
             break;
+        case 'UserOrderTable':
+            columns = getUserOrderTableColumns()
+            controllerUrl = '/Order/GetUserOrders'
+            break;
+        case 'AdminOrderTable':
+            columns = getAdminOrderTableColumns()
+            controllerUrl = '/Order/GetAdminOrders'
+            break;
     }
     dataTable = $("#" + tableId).DataTable({
         ajax: {
@@ -31,12 +39,22 @@ function loadDataTable(tableId, userId) {
             datatype: "json"
         },
         columns: columns,
+        "drawCallback": function () {
+            if (tableId == 'UserOrderTable') {
+                mergeColumns('UserOrderTable')
+            }
+            if (tableId == 'AdminOrderTable') {
+                mergeColumns('AdminOrderTable')
+            }
+        },
+        "initComplete": function () {
+            if (tableId == 'CartTable') {
+                loadCartFooter()
+                getTotalCount()
+            }
+        }
     })
     loadDefaultDataTableSettings()
-    console.log("ended loading table")
-    if (tableId == 'CartTable') {
-        loadCartFooter()
-    }
 }
 
 function getBicyclesTableColumns() {
@@ -77,7 +95,8 @@ function getProducersTableColumns() {
         }
     ]
 }
-function getUsersTableColumns(userId) {
+function getUsersTableColumns() {
+    let userId = getUserId();
     return [
         { data: "fullName", width: "15%" },
         { data: "phone", width: "16%" },
@@ -125,6 +144,54 @@ function getShoppingCartTableColumns() {
         }
     ]
 }
+function getUserOrderTableColumns() {
+    return [
+        { data: "orderId", width: "3%", },
+        { data: "name", width: "20%" },
+        { data: "quantity", width: "12%", bSortable: false, aTargets: [1], },
+        { data: "bicycleCost", width: "9%" },
+        {
+            data: { id: "orderId", status: "status", userId: "userId" }, bSortable: false, aTargets: [1],
+            render: function (data) {
+                if (data.status == 'Sended') {
+                    return `<div class="text-center">
+                        <a class='btn btn-success text-white' style='cursor:pointer; width:45%;'
+                            onclick="confirmReceipt(${data.orderId})">
+                            Сonfirm receipt
+                        </a>
+                    </div>`
+                }
+
+                return data.status
+            },
+            width: "40%"
+        }
+    ]
+}
+function getAdminOrderTableColumns() {
+    return [
+        { data: "orderId", width: "3%", },
+        { data: "name", width: "20%" },
+        { data: "quantity", width: "12%", bSortable: false, aTargets: [1], },
+        { data: "bicycleCost", width: "9%" },
+        { data: "fullName", width: "20%"},
+        {
+            data: { id: "orderId", status: "status"}, bSortable: false, aTargets: [1],
+            render: function (data) {
+                if (data.status == 'Processing') {
+                    return `<div class="text-center">
+                        <a class='btn btn-info text-white' style='cursor:pointer; width:45%;'
+                            onclick="sendOrder(${data.orderId})">
+                            Send
+                        </a>
+                    </div>`
+                }
+                return data.status
+            },
+            width: "40%"
+        }
+    ]
+}
 
 // default datatable settings
 function loadAdminTableButtons(addUrl, deleteUrl, objId) {
@@ -140,7 +207,7 @@ function loadAdminTableButtons(addUrl, deleteUrl, objId) {
                 </a>
             </div>`
 }
-function loadDefaultAdminTableSettings() {
+function loadDefaultDataTableSettings() {
     dataTable = {
         retrieve: true,
         paging: false,
@@ -166,6 +233,7 @@ function deleteObj(functionUrl, objectId) {
                 data: { id: objectId },
                 success: function (data) {
                     if (data.success) {
+                        console.log(tId)
                         $(tId).DataTable().ajax.reload()
                         toastr.success(data.message);
                     }
@@ -335,4 +403,125 @@ function createOrder() {
             });
         }
     });
+}
+
+// order actions
+function sendOrder(orderId) {
+    $.ajax({
+        type: 'POST',
+        url: '/Order/SendOrder',
+        data: { OrderId: orderId },
+        success: function (data) {
+            if (data.success) {
+                toastr.success(data.message);
+                $(tId).DataTable().ajax.reload()
+            }
+            else {
+                toastr.error(data.message);
+                $(tId).DataTable().ajax.reload()
+            }
+        }
+    })
+    
+}
+function confirmReceipt(orderId) {
+    $.ajax({
+        type: 'POST',
+        url: '/Order/ConfirmReceipt',
+        data: { OrderId: orderId },
+        success: function (data) {
+            if (data.success) {
+                toastr.success(data.message);
+                $(tId).DataTable().ajax.reload()
+            }
+            else {
+                toastr.error(data.message);
+                $(tId).DataTable().ajax.reload()
+            }
+        }
+    })
+
+}
+function setOrderTableButtons() {
+    console.log('setOrderTableButtons')
+    let role = getUserRole();
+    let table = document.getElementById('UserOrderTable')
+    for (var i = 1; i < table.rows.length; i++) {
+        console.log(i)
+        console.log(table.rows[i].cells[3].innerText)
+        if (table.rows[i].cells[4].innerText == 'Processing' && (role.data == 'SuperAdmin' || role.data == 'Admin')) {
+            console.log("admin")
+            table.rows[i].cells[4].html = (`<div class="text-center">
+                <a class='btn btn-danger text-white' style='cursor:pointer; width:45%;'
+                    >
+                    Send
+                </a>
+            </div>`)
+        }
+    }
+    //for (let row of table.rows) {
+    //    console.log(row.cells[4].innerText)
+    //    console.log(row.cells[4].innerText == 'Processing')
+    //    console.log((role.data == 'SuperAdmin' || role.data == 'Admin'))
+    //    if (row.cells[4].innerText == 'Processing' && (role.data == 'SuperAdmin' || role.data == 'Admin')) {
+    //        console.log("admin")
+    //        row.cells[4].html(`<div class="text-center">
+    //            <a class='btn btn-danger text-white' style='cursor:pointer; width:45%;'
+    //                OnClick="removeFromCart('${data.id}')">
+    //                Send
+    //            </a>
+    //        </div>`)
+    //    }
+    //    else
+    //        return `<div></div>`
+    //    return `<div></div>`
+    //}
+}
+function mergeColumns(tableId) {
+    let table = document.getElementById(tableId)
+    let headerCell = null, statusCell
+    for (let row of table.rows) {
+        const firstCell = row.cells[0];
+        if (headerCell === null || firstCell.innerText !== headerCell.innerText) {
+            headerCell = firstCell;
+            statusCell = row.cells[4]
+            if (tableId == ('AdminOrderTable'))
+                userCell = row.cells[5]
+        } else {
+            statusCell.rowSpan++
+            headerCell.rowSpan++
+            if (tableId == ('AdminOrderTable')) {
+                userCell.rowSpan++
+                row.cells[5].remove()
+            }
+            row.cells[4].remove()
+            firstCell.remove();
+        }
+    }
+}
+
+// user actions
+function getUserRole() {
+    let res
+    $.ajax({
+        type: 'GET',
+        url: '/User/GetUserRole',
+        async: false,
+        success: function (data) {
+            res = data
+        }
+    });
+    return res
+}
+function getUserId() {
+    let res
+    $.ajax({
+        type: 'GET',
+        url: '/User/GetUserId',
+        async: false,
+        success: function (data) {
+            res = data
+        }
+    });
+    return res
 }
