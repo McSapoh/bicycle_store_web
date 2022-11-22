@@ -15,20 +15,10 @@
     <header class="bg-dark">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark border-bottom box-shadow">
             <div class="justify-content-center col-md-2">
-                <a class="navbar-brand text-white text-center" asp-area="" asp-controller="User" asp-action="Index">Bicycle Store</a>
+                <a class="navbar-brand text-white text-center" asp-area="" asp-controller="User" asp-action="Bicycles">Bicycle Store</a>
             </div>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between row">
-                <ul class="navbar-nav flex-grow-1 col-md-10">
-                    <li class="nav-item">
-                        <a class="nav-link text-white" asp-area="" asp-controller="Admin" asp-action="Index">Admin Bicycles</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="Bicycles">Bicycles</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" asp-area="" asp-controller="ShoppingCart" asp-action="Index">Shopping Cart</a>
-                    </li>
-                </ul>
+                <ul class="navbar-nav flex-grow-1 col-md-10"></ul>
                 <ul class="navbar-nav flex-grow-1">
                     @{
                         if (User.Identity.IsAuthenticated)
@@ -39,11 +29,14 @@
                                     <li>
                                         <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="SetProfile">Change Profile</a>
                                     </li>
-                                    <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="Logout">Log out</a>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="ShoppingCart" asp-action="Index">Shopping Cart</a>
                                     </li>
                                     <li>
                                         <a class="nav-link text-white" asp-area="" asp-controller="Order" asp-action="UserOrders">Orders</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="Logout">Log out</a>
                                     </li>
                                 </ul>
                             </li>

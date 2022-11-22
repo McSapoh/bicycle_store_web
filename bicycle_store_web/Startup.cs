@@ -68,7 +68,7 @@ namespace bicycle_store_web
                 endpoints.MapControllerRoute(
                     name: "default",
                     //pattern: "{controller=Admin}/{action=Index}/{id?}");
-                    pattern: "{controller=User}/{action=Index}/{id?}");
+                    pattern: "{controller=User}/{action=Bicycles}/{id?}");
             });  
         }
     }

@@ -63,9 +63,6 @@ namespace bicycle_store_web.Controllers
             //AddImages();
         }
         [Authorize(Roles = "SuperAdmin,Admin")]
-        public IActionResult Index() => View();
-
-        [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Bicycles() => View();
 
         [Authorize(Roles = "SuperAdmin,Admin")]

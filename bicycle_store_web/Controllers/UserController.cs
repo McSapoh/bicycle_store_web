@@ -49,7 +49,6 @@ namespace bicycle_store_web.Controllers
             this.bicycleService = bicycleService;
             //AddImages();
         }
-        public IActionResult Index() => View();
         public IActionResult Bicycles() => View("Bicycles", AddData());
         public IActionResult SetProfile() 
         {
@@ -80,7 +79,7 @@ namespace bicycle_store_web.Controllers
         public IActionResult Logout ()
         {
             HttpContext.SignOutAsync();
-            return Redirect("Index");
+            return Redirect("Bicycles");
         }
         [HttpPost("User/Login")]
         public IActionResult IsLogin(string Username, string Password, string ReturnUrl)
@@ -90,8 +89,8 @@ namespace bicycle_store_web.Controllers
             {
                 HttpContext.SignInAsync(userService.GetClaims(user));
                 if ((user.Role == "Admin" || user.Role == "SuperAdmin") && ReturnUrl == null)
-                    return Redirect("/Admin/Index");
-                return Redirect(ReturnUrl ?? "Index");
+                    return Redirect("/Admin/Bicycles");
+                return Redirect(ReturnUrl ?? "Bicycles");
             }
             return BadRequest();
         }
