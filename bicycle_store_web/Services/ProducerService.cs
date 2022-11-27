@@ -1,26 +1,21 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace bicycle_store_web.Services
 {
     public class ProducerService
     {
-        private IWebHostEnvironment WebHostEnvironment { get; set; }
-        private readonly bicycle_storeContext _db;
-        public ProducerService(IWebHostEnvironment WebHostEnvironment, bicycle_storeContext context)
+        private readonly ProducerRepository producerRepo;
+        public ProducerService(bicycle_storeContext context)
         {
-            this.WebHostEnvironment = WebHostEnvironment;
-            _db = context;
+            producerRepo = new ProducerRepository(context);
         }
         [HttpGet]
-        public Producer GetProducer(int id)
+        public Producer GetById(int Id)
         {
-            var producer = _db.Producers.FirstOrDefault(p => p.Id == id);
+            var producer = producerRepo.GetById(Id);
             if (producer == null)
                 return null;
             else
@@ -29,7 +24,8 @@ namespace bicycle_store_web.Services
         [HttpGet]
         public IActionResult GetProducers()
         {
-            var list = _db.Producers.Select(p => new {
+            var list = producerRepo.GetAll().Select(p => new
+            {
                 p.Id,
                 p.Name,
                 p.Description
@@ -39,26 +35,23 @@ namespace bicycle_store_web.Services
         [HttpPost]
         public IActionResult DeleteProducer(int Id)
         {
-            var producerFromDb = _db.Producers.FirstOrDefault(t => t.Id == Id);
-            if (producerFromDb == null)
-            {
+            if (producerRepo.Delete(Id))
                 return new JsonResult(new { success = false, message = "Error while Deleting" });
-            }
-            _db.Producers.Remove(producerFromDb);
-            _db.SaveChanges();
             return new JsonResult(new { success = true, message = "Delete successful" });
         }
-
         [HttpPost]
         public IActionResult SaveProducer(Producer producer)
         {
+            bool result;
             if (producer.Id == 0)
-                _db.Producers.Add(producer);
+                result = producerRepo.Create(producer);
             else
-                _db.Producers.Update(producer);
-            _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Successfully saves" });
+                result = producerRepo.Update(producer);
+
+            if (result)
+                return new JsonResult(new { success = true, message = "Successfully saved" });
+            return new JsonResult(new { success = false, message = "Error while saving" });
         }
-        public SelectList GetProducerSelectList() => new SelectList(_db.Producers.ToList(), "Id", "Name");
+        public SelectList GetSelectList() => producerRepo.GetSelectList();
     }
 }

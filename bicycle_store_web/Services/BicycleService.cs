@@ -1,27 +1,23 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using bicycle_store_web.Repositories;
 
 namespace bicycle_store_web.Services
 {
     public class BicycleService
     {
-        private IWebHostEnvironment WebHostEnvironment { get; set; }
-        private readonly bicycle_storeContext _db;
-        public BicycleService(IWebHostEnvironment WebHostEnvironment, bicycle_storeContext context)
+        private readonly BicycleRepository bicycleRepo;
+        public BicycleService(bicycle_storeContext context)
         {
-            this.WebHostEnvironment = WebHostEnvironment;
-            _db = context;
+            bicycleRepo = new BicycleRepository(context);
         }
         [HttpGet]
-        public Bicycle GetBicycle(int id)
+        public Bicycle GetBicycle(int Id)
         {
-            var bicycle = _db.Bicycles.FirstOrDefault(b => b.Id == id);
+            var bicycle = bicycleRepo.GetById(Id);
             if (bicycle == null)
                 return null;
             else
@@ -30,17 +26,12 @@ namespace bicycle_store_web.Services
         [HttpGet]
         public IActionResult GetBicycles()
         {
-            var list = _db.Bicycles.Select(b => new {
-                b.Id,
-                b.Name,
-                b.WheelDiameter,
-                b.Price,
-                b.Quantity,
-                b.TypeId,
-                b.Type,
-                b.CountryId,
-                b.Country,
-                b.ProducerId,
+            var list = bicycleRepo.GetAll().Select(b => new {
+                b.Id,b.Name,
+                b.WheelDiameter, b.Price,
+                b.Quantity, b.TypeId,
+                b.Type, b.CountryId,
+                b.Country, b.ProducerId,
                 b.Producer,
             }).ToList();
             return new JsonResult(new { data = list });
@@ -48,13 +39,8 @@ namespace bicycle_store_web.Services
         [HttpPost]
         public IActionResult DeleteBicycle(int Id)
         {
-            var bicycleFromDb = _db.Bicycles.FirstOrDefault(b => b.Id == Id);
-            if (bicycleFromDb == null)
-            {
+            if (bicycleRepo.Delete(Id))
                 return new JsonResult(new { success = false, message = "Error while Deleting" });
-            }
-            _db.Bicycles.Remove(bicycleFromDb);
-            _db.SaveChanges();
             return new JsonResult(new { success = true, message = "Delete successful" });
         }
         [HttpPost]
@@ -73,13 +59,14 @@ namespace bicycle_store_web.Services
             }
 
             if (bicycle.Id == 0)
-                _db.Bicycles.Add(bicycle);
+                if (bicycleRepo.Create(bicycle))
+                    return new JsonResult(new { success = true, message = "Successfully saved" });
             else
-                _db.Bicycles.Update(bicycle);
-            _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Successfully saved" });
-        }
-        public SelectList GetBicycleSelectList() => new SelectList(_db.Bicycles.ToList(), "Id", "Name");
+                if (bicycleRepo.Update(bicycle))
+                    return new JsonResult(new { success = true, message = "Successfully saved" });
 
+            return new JsonResult(new { success = false, message = "Error while saving" });
+        }
+        public SelectList GetSelectList() => bicycleRepo.GetSelectList();
     }
 }

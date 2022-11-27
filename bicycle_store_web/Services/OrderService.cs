@@ -1,46 +1,61 @@
 ﻿using bicycle_store_web.Migrations;
 using bicycle_store_web.Models;
-using Microsoft.AspNetCore.Hosting;
+using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace bicycle_store_web.Services
 {
     public class OrderService
     {
-        private IWebHostEnvironment WebHostEnvironment { get; set; }
-        public int UserId { get; private set; }
-
-        private readonly bicycle_storeContext _db;
-        private readonly ShoppingCartOrderService shoppingCartOrderService;
         private readonly ShoppingCartService shoppingCartService;
+        private readonly ShoppingCartOrderRepository shoppingCartOrderRepo;
         private readonly BicycleService bicycleService;
-        private readonly UserService userService;
-        public OrderService(IWebHostEnvironment WebHostEnvironment, bicycle_storeContext context,
-            ShoppingCartOrderService shoppingCartOrderService, BicycleService bicycleService, 
-            UserService userService, ShoppingCartService shoppingCartService)
+        private readonly OrderRepository orderRepo;
+        private readonly BicycleRepository bicycleRepo;
+        private readonly BicycleOrderRepository bicycleOrderRepo;
+        public OrderService(bicycle_storeContext context, BicycleService bicycleService, 
+            ShoppingCartService shoppingCartService)
         {
-            this.userService = userService;
-            this.shoppingCartOrderService = shoppingCartOrderService;
             this.shoppingCartService = shoppingCartService;
             this.bicycleService = bicycleService;
-            this.WebHostEnvironment = WebHostEnvironment;
-            _db = context;
+            orderRepo = new OrderRepository(context);
+            bicycleRepo = new BicycleRepository(context);
+            bicycleOrderRepo = new BicycleOrderRepository(context);
+            shoppingCartOrderRepo = new ShoppingCartOrderRepository(context);
         }
-        public Order GetOrder(int OrderId) => _db.Orders.FirstOrDefault(o => o.OrderId == OrderId);
-        public IActionResult GetUserOrders(int UserId)
+        public IActionResult GetAdminOrders()
         {
-            var UserOrders = _db.Orders.Where(o => o.UserId == UserId).ToList();
+            var UserOrders = orderRepo.GetAll();
             var UserBicycleOrders = new List<BicycleOrder>();
             foreach (var userOrder in UserOrders)
             {
-                var bicycleOrders = _db.BicycleOrders.Include(b => b.Bicycle)
-                    .Where(bo => bo.OrderId == userOrder.OrderId).ToList();
+                var bicycleOrders = bicycleOrderRepo.GetAll(userOrder.OrderId);
+                foreach (var bicycleOrder in bicycleOrders)
+                {
+                    UserBicycleOrders.Add(bicycleOrder);
+                }
+            }
+            var ResultList = UserBicycleOrders.Select(o => new
+            {
+                o.OrderId,
+                o.Bicycle.Name,
+                o.Quantity,
+                o.BicycleCost,
+                o.Order.Status,
+                o.Order.User.FullName
+            }).ToList();
+            return new JsonResult(new { data = ResultList });
+        }
+        public IActionResult GetUserOrders(int UserId)
+        {
+            var UserOrders = orderRepo.GetAll(UserId);
+            var UserBicycleOrders = new List<BicycleOrder>();
+            foreach (var userOrder in UserOrders)
+            {
+                var bicycleOrders = bicycleOrderRepo.GetAll(userOrder.OrderId);
                 foreach (var bicycleOrder in bicycleOrders)
                 {
                     UserBicycleOrders.Add(bicycleOrder);
@@ -57,31 +72,6 @@ namespace bicycle_store_web.Services
             }).ToList();
             return new JsonResult(new { data = ResultList });
         }
-        public IActionResult GetAdminOrders()
-        {
-            var UserOrders = _db.Orders.Include(o => o.User).ToList();
-            var UserBicycleOrders = new List<BicycleOrder>();
-            foreach (var userOrder in UserOrders)
-            {
-                var bicycleOrders = _db.BicycleOrders.Include(b => b.Bicycle)
-                    .Where(bo => bo.OrderId == userOrder.OrderId).ToList();
-                foreach (var bicycleOrder in bicycleOrders)
-                {
-                    UserBicycleOrders.Add(bicycleOrder);
-                }
-            }
-            var ResultList = UserBicycleOrders.Select(o => new
-            {
-                o.OrderId,
-                o.Bicycle.Name,
-                o.Quantity,
-                o.BicycleCost,
-                o.Order.Status,
-                o.Order.User.FullName
-            }).ToList();
-
-            return new JsonResult(new { data = ResultList });
-        }
         public int GetTotalCost(List<ShoppingCartOrder> CartOrders)
         {
             int TotalCost = 0;
@@ -92,7 +82,7 @@ namespace bicycle_store_web.Services
         public IActionResult CreateOrder(int UserId)
         {
             var ShoppingCartId = shoppingCartService.GetShoppingCartId(UserId);
-            var CartOrders = shoppingCartOrderService.GetListShoppingCartOrders(ShoppingCartId);
+            var CartOrders = shoppingCartOrderRepo.GetAll(ShoppingCartId);
             var Order = new Order()
             {
                 Data = DateTime.Now,
@@ -100,47 +90,41 @@ namespace bicycle_store_web.Services
                 Cost = GetTotalCost(CartOrders),
                 Status = OrderStatus.Processing.ToString()
             };
-            try
-            {
-                Order.OrderId = _db.Orders.Max(o => o.OrderId) + 1;
-            }
-            catch (Exception)
-            {
-                Order.OrderId = 1;
-            }
-            _db.Orders.Add(Order);
+            Order.OrderId = orderRepo.GetMaxId();
+            orderRepo.Create(Order);
             foreach (var CartOrder in CartOrders)
             {
                 var bicycle = bicycleService.GetBicycle(CartOrder.BicycleId);
                 bicycle.Quantity -= (uint)CartOrder.Quantity;
-                _db.Bicycles.Update(bicycle);
-                _db.BicycleOrders.Add(new BicycleOrder()
+                var res1 = bicycleRepo.Update(bicycle);
+                var res2 = bicycleOrderRepo.Create(new BicycleOrder()
                 {
                     BicycleId = CartOrder.BicycleId,
                     Quantity = CartOrder.Quantity,
                     BicycleCost = (int)(CartOrder.Quantity * CartOrder.Bicycle.Price),
                     OrderId = Order.OrderId,
                 });
+                if (res1 || res2 == false)
+                    return new JsonResult(new { success = true, message = "Error while creating" });
             }
             shoppingCartService.ClearShoppingCart(UserId);
-            _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Successfully purchased" });
+            return new JsonResult(new { success = true, message = "Order successfully created" });
         }
         public IActionResult SendOrder(int OrderId)
         {
-            var order = GetOrder(OrderId);
+            var order = orderRepo.GetById(OrderId);
             order.Status = OrderStatus.Sended.ToString();
-            _db.Orders.Update(order);
-            _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Successfully sended" });
+            if (orderRepo.Update(order))
+                return new JsonResult(new { success = true, message = "Successfully sended" });
+            return new JsonResult(new { success = false, message = "Error while sending" });
         }
         public IActionResult ConfirmReceipt(int OrderId)
         {
-            var order = GetOrder(OrderId);
+            var order = orderRepo.GetById(OrderId);
             order.Status = OrderStatus.Received.ToString();
-            _db.Orders.Update(order);
-            _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Successfully sended" });
+            if (orderRepo.Update(order))
+                return new JsonResult(new { success = true, message = "Successfully sended" });
+            return new JsonResult(new { success = false, message = "Error while sending" });
         }
     }
 }

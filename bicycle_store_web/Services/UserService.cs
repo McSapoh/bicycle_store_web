@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -7,75 +6,69 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
 using bicycle_store_web.Enums;
+using bicycle_store_web.Repositories;
 
 namespace bicycle_store_web.Services
 {
     public class UserService
     {
-        private IWebHostEnvironment WebHostEnvironment { get; set; }
-        private readonly bicycle_storeContext _db;
         private readonly ShoppingCartService shopingCartService;
-        public UserService(IWebHostEnvironment WebHostEnvironment, bicycle_storeContext context,
-            ShoppingCartService shopingCartService)
+        private readonly UserRepository userRepo;
+        public UserService(bicycle_storeContext context, ShoppingCartService shopingCartService)
         {
-            this.WebHostEnvironment = WebHostEnvironment;
             this.shopingCartService = shopingCartService;
-            _db = context;
+            userRepo = new UserRepository(context);
         }
         [HttpGet]
-        public int GetUserId(string Username) => _db.Users.FirstOrDefault(u => u.Username == Username).Id;
+        public int GetUserId(string Username) => userRepo.GetUserId(Username);
         [HttpGet]
-        public string GetUserRole(int UserId) => 
-            _db.Users.FirstOrDefault(u => u.Id == UserId).Role.ToString();
+        public string GetUserRole(int UserId) => userRepo.GetUserRole(UserId);
         [HttpGet]
-        public User GetUser(string Username) => _db.Users.FirstOrDefault(u => u.Username == Username);
+        public User GetById(int Id) => userRepo.GetById(Id);
         [HttpGet]
         public IActionResult GetUsers()
         {
-            var list = _db.Users.Select(u => new {
-                u.Id,
-                u.FullName,
-                u.Phone,
-                u.Email,
-                u.Adress,
-                u.Username,
-                u.Role,
-                u.Photo
+            var list = userRepo.GetAll().Select(u => new
+            {
+                u.Id, u.FullName,
+                u.Phone, u.Email,
+                u.Adress, u.Username,
+                u.Role, u.Photo
             }).ToList();
             return new JsonResult(new { data = list });
         }
         [HttpPost]
         public IActionResult ChangePermisions(int Id)
         {
-            var user = _db.Users.FirstOrDefault(u => u.Id == Id);
+            var user = userRepo.GetById(Id);
             if (user.Photo == null)
                 user.Photo = Properties.Resources.admin;
             if (user != null)
             {
+                bool result;
                 if (user.Role == Roles.SuperAdmin.ToString())
                 {
                     if (user.Photo == null)
                         user.Photo = Properties.Resources.admin;
-                    _db.Users.Update(user);
+                    result = userRepo.Update(user);
                 }
                 else if (user.Role == Roles.Admin.ToString())
                 {
                     if (user.Photo.SequenceEqual(Properties.Resources.admin))
                         user.Photo = Properties.Resources.user;
                     user.Role = Roles.User.ToString();
-                    _db.Users.Update(user);
+                    result = userRepo.Update(user);
                 }
                 else
                 {
                     if (user.Photo.SequenceEqual(Properties.Resources.user))
                         user.Photo = Properties.Resources.admin;
                     user.Role = Roles.Admin.ToString();
-                    _db.Users.Update(user);
+                    result = userRepo.Update(user);
                 }
-                _db.SaveChanges();
-                return new JsonResult(new { success = true, message = "Successfully changed" });
+                if (result == true)
+                    return new JsonResult(new { success = true, message = "Successfully changed" });
             }
             return new JsonResult(new { success = false, message = "Error while changing" });
         }
@@ -104,28 +97,25 @@ namespace bicycle_store_web.Services
                 }
             }
 
-
+            bool result;
             if (user.Id == 0)
             {
-                _db.Users.Add(user);
                 shopingCartService.CreateShopingCart(user.Id);
+                result = userRepo.Create(user);
             }
             else
-                _db.Users.Update(user);
-            _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Successfully saved" });
+                result = userRepo.Update(user);
+
+            if (result == true)
+                return new JsonResult(new { success = true, message = "Successfully changed" });
+            return new JsonResult(new { success = false, message = "Error while changing" });
         }
         [HttpPost]
         public IActionResult DeleteUser(int Id)
         {
-            var userFromDb = _db.Users.FirstOrDefault(u => u.Id == Id);
-            if (userFromDb == null)
-            {
-                return new JsonResult(new { success = false, message = "Error while Deleting" });
-            }
-            _db.Users.Remove(userFromDb);
-            _db.SaveChanges();
-            return new JsonResult(new { success = true, message = "Delete successful" });
+            if (userRepo.Delete(Id))
+                return new JsonResult(new { success = true, message = "Successfully deleted" });
+            return new JsonResult(new { success = false, message = "Error while deleting" });
         }
         public ClaimsPrincipal GetClaims (User user)
         {

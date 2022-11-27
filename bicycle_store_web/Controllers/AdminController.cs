@@ -6,10 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace bicycle_store_web.Controllers
@@ -84,9 +81,9 @@ namespace bicycle_store_web.Controllers
         {
             bicycle = new Bicycle();
             bicycle.Photo = Properties.Resources.bicycle;
-            ViewBag.Type = typeService.GetTypeSelectList();
+            ViewBag.Type = typeService.GetSelectList();
             ViewBag.Country = new SelectList(_db.Countries.ToList(), "Id", "Name");
-            ViewBag.Producer = producerService.GetProducerSelectList();
+            ViewBag.Producer = producerService.GetSelectList();
             if (id == null)
                 return PartialView("_AddBicycle", bicycle);
             bicycle = bicycleService.GetBicycle(id.Value);
@@ -99,7 +96,7 @@ namespace bicycle_store_web.Controllers
             type = new Type();
             if (id == null)
                 return PartialView("_AddType", type);
-            type = typeService.GetType(id.Value);
+            type = typeService.GetById(id.Value);
             if (type == null)
                 return NotFound();
             return PartialView("_AddType", type);
@@ -109,7 +106,7 @@ namespace bicycle_store_web.Controllers
             producer = new Producer();
             if (id == null)
                 return PartialView("_AddProducer", producer);
-            producer = producerService.GetProducer(id.Value);
+            producer = producerService.GetById(id.Value);
             if (producer == null)
                 return NotFound();
             return PartialView("_AddProducer", producer);
@@ -122,27 +119,20 @@ namespace bicycle_store_web.Controllers
         // User actions
         [HttpGet]
         public IActionResult GetUsers() => userService.GetUsers();
+
         [HttpPost]
         public IActionResult ChangePermisions(int Id) => userService.ChangePermisions(Id);
         // Bicycle actions
         [HttpGet]
         public IActionResult GetBicycles() => bicycleService.GetBicycles();
+        [HttpPost]
         public IActionResult DeleteBicycle(int Id) => bicycleService.DeleteBicycle(Id);
-
         [HttpPost]
         public IActionResult SaveBicycle(Bicycle bicycle, IFormFile Photo)
         {
-            return bicycleService.SaveBicycle(bicycle, Photo);
-            //if (ModelState.IsValid)
-            //{
-            //    if (bicycle.Id == 0)
-            //        _db.Bicycles.Add(bicycle);
-            //    else
-            //        _db.Bicycles.Update(bicycle);
-            //    _db.SaveChanges();
-            //    return Json(new { success = true, message = "Successfully saves" });
-            //}
-            //return Json(new { success = false, message = "Error while saving" });
+            if (ModelState.IsValid)
+                return bicycleService.SaveBicycle(bicycle, Photo);
+            return Json(new { success = false, message = "Error while saving" });
         }
         [HttpGet]
         // Types actions
@@ -150,7 +140,6 @@ namespace bicycle_store_web.Controllers
         public IActionResult GetTypes() => typeService.GetTypes();
         [HttpPost]
         public IActionResult DeleteType(int Id) => typeService.DeleteType(Id);
-
         [HttpPost]
         public IActionResult SaveType()
         {
@@ -163,13 +152,19 @@ namespace bicycle_store_web.Controllers
         public IActionResult GetProducers() => producerService.GetProducers();
         [HttpPost]
         public IActionResult DeleteProducer(int Id) => producerService.DeleteProducer(Id);
-
         [HttpPost]
         public IActionResult SaveProducer()
         {
             if (ModelState.IsValid)
                 return producerService.SaveProducer(producer);
             return Json(new { success = false, message = "Error while saving" });
+            //if (ModelState.IsValid) 
+            //{
+            //    if (producerService.Save(producer))
+            //        return Json(new { success = true, message = "Successfully saved" });
+            //    return Json(new { success = false, message = "Error while saving" });
+            //}
+            //return Json(new { success = false, message = "Error while saving" });
         }
         #endregion
     }

@@ -3,14 +3,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Linq;
 
 namespace bicycle_store_web.Controllers
 {
     public class UserController : Controller
     {
-        private readonly ILogger<UserController> _logger;
         private readonly bicycle_storeContext _db;
         private readonly UserService userService;
         private readonly BicycleService bicycleService;
@@ -40,10 +38,8 @@ namespace bicycle_store_web.Controllers
             }
             return bicycles;
         }
-        public UserController(ILogger<UserController> logger, bicycle_storeContext context, 
-            UserService userService, BicycleService bicycleService)
+        public UserController(bicycle_storeContext context, UserService userService, BicycleService bicycleService)
         {
-            _logger = logger;
             _db = context;
             this.userService = userService;
             this.bicycleService = bicycleService;
@@ -53,14 +49,15 @@ namespace bicycle_store_web.Controllers
         public IActionResult SetProfile() 
         {
             if (User.Identity.IsAuthenticated)
-                user = _db.Users.FirstOrDefault(u => u.FullName == User.Identity.Name);
+                user = userService.GetById(userService.GetUserId(User.Identity.Name));
+            //user = _db.Users.FirstOrDefault(u => u.FullName == User.Identity.Name);
             else
                 user = new User();
             return View(user);
         }
         public IActionResult OrderCreating()
         {
-            ViewBag.Bicycles = bicycleService.GetBicycleSelectList();
+            ViewBag.Bicycles = bicycleService.GetSelectList();
             order = new Order();
             var bicycleOrder = new BicycleOrder();
             order.BicycleOrders.Add(bicycleOrder);
@@ -84,7 +81,7 @@ namespace bicycle_store_web.Controllers
         [HttpPost("User/Login")]
         public IActionResult IsLogin(string Username, string Password, string ReturnUrl)
         {
-            user = userService.GetUser(Username);
+            user = userService.GetById(userService.GetUserId(Username));
             if(user != null && user.Password == Password)
             {
                 HttpContext.SignInAsync(userService.GetClaims(user));
