@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32602.291
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bicycle_store_web", "bicycle_store_web\bicycle_store_web.csproj", "{AF1913FB-CB68-47E5-8029-1897C485B4BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "bicycle_store_web", "bicycle_store_web\bicycle_store_web.csproj", "{AF1913FB-CB68-47E5-8029-1897C485B4BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BicycleStore.Tests", "BicycleStore.Tests\BicycleStore.Tests.csproj", "{41DA7933-3796-448C-AE8B-8F69CF74D041}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{AF1913FB-CB68-47E5-8029-1897C485B4BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF1913FB-CB68-47E5-8029-1897C485B4BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF1913FB-CB68-47E5-8029-1897C485B4BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41DA7933-3796-448C-AE8B-8F69CF74D041}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41DA7933-3796-448C-AE8B-8F69CF74D041}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41DA7933-3796-448C-AE8B-8F69CF74D041}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41DA7933-3796-448C-AE8B-8F69CF74D041}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

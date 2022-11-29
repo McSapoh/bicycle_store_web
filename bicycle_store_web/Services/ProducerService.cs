@@ -1,4 +1,5 @@
-﻿using bicycle_store_web.Repositories;
+﻿using bicycle_store_web.Interfaces;
+using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
@@ -7,15 +8,15 @@ namespace bicycle_store_web.Services
 {
     public class ProducerService
     {
-        private readonly ProducerRepository producerRepo;
-        public ProducerService(bicycle_storeContext context)
+        private readonly IProducerRepository _producerRepo;
+        public ProducerService(IProducerRepository producerRepo)
         {
-            producerRepo = new ProducerRepository(context);
+            this._producerRepo = producerRepo;
         }
         [HttpGet]
         public Producer GetById(int Id)
         {
-            var producer = producerRepo.GetById(Id);
+            var producer = _producerRepo.GetById(Id);
             if (producer == null)
                 return null;
             else
@@ -24,7 +25,7 @@ namespace bicycle_store_web.Services
         [HttpGet]
         public IActionResult GetProducers()
         {
-            var list = producerRepo.GetAll().Select(p => new
+            var list = _producerRepo.GetAll().Select(p => new
             {
                 p.Id,
                 p.Name,
@@ -35,7 +36,7 @@ namespace bicycle_store_web.Services
         [HttpPost]
         public IActionResult DeleteProducer(int Id)
         {
-            if (producerRepo.Delete(Id))
+            if (_producerRepo.Delete(Id))
                 return new JsonResult(new { success = false, message = "Error while Deleting" });
             return new JsonResult(new { success = true, message = "Delete successful" });
         }
@@ -44,14 +45,14 @@ namespace bicycle_store_web.Services
         {
             bool result;
             if (producer.Id == 0)
-                result = producerRepo.Create(producer);
+                result = _producerRepo.Create(producer);
             else
-                result = producerRepo.Update(producer);
+                result = _producerRepo.Update(producer);
 
             if (result)
                 return new JsonResult(new { success = true, message = "Successfully saved" });
             return new JsonResult(new { success = false, message = "Error while saving" });
         }
-        public SelectList GetSelectList() => producerRepo.GetSelectList();
+        public SelectList GetSelectList() => _producerRepo.GetSelectList();
     }
 }

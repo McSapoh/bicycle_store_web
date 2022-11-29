@@ -50,7 +50,6 @@ namespace bicycle_store_web.Controllers
         {
             if (User.Identity.IsAuthenticated)
                 user = userService.GetById(userService.GetUserId(User.Identity.Name));
-            //user = _db.Users.FirstOrDefault(u => u.FullName == User.Identity.Name);
             else
                 user = new User();
             return View(user);

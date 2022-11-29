@@ -1,4 +1,6 @@
+using bicycle_store_web.Interfaces;
 using bicycle_store_web.Models;
+using bicycle_store_web.Repositories;
 using bicycle_store_web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +29,8 @@ namespace bicycle_store_web
             services.AddDbContext<bicycle_storeContext>(options => 
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), serverVersion));
             services.AddControllersWithViews();
+
+            // Adding services
             services.AddScoped<BicycleService>();
             services.AddScoped<TypeService>();
             services.AddScoped<ProducerService>();
@@ -34,6 +38,17 @@ namespace bicycle_store_web
             services.AddScoped<ShoppingCartService>();
             services.AddScoped<ShoppingCartOrderService>();
             services.AddScoped<OrderService>();
+
+            // Adding repositories
+            services.AddScoped<IBicycleRepository, BicycleRepository>();
+            services.AddScoped<IBicycleOrderRepository, BicycleOrderRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IProducerRepository, ProducerRepository>();
+            services.AddScoped<IShoppingCartOrderRepository, ShoppingCartOrderRepository>();
+            services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+            services.AddScoped<ITypeRepository, TypeRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => 
                     {

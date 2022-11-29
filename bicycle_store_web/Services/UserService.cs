@@ -7,29 +7,29 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using bicycle_store_web.Enums;
-using bicycle_store_web.Repositories;
+using bicycle_store_web.Interfaces;
 
 namespace bicycle_store_web.Services
 {
     public class UserService
     {
         private readonly ShoppingCartService shopingCartService;
-        private readonly UserRepository userRepo;
-        public UserService(bicycle_storeContext context, ShoppingCartService shopingCartService)
+        private readonly IUserRepository _userRepo;
+        public UserService(ShoppingCartService shopingCartService, IUserRepository userRepo)
         {
             this.shopingCartService = shopingCartService;
-            userRepo = new UserRepository(context);
+            _userRepo = userRepo;
         }
         [HttpGet]
-        public int GetUserId(string Username) => userRepo.GetUserId(Username);
+        public int GetUserId(string Username) => _userRepo.GetUserId(Username);
         [HttpGet]
-        public string GetUserRole(int UserId) => userRepo.GetUserRole(UserId);
+        public string GetUserRole(int UserId) => _userRepo.GetUserRole(UserId);
         [HttpGet]
-        public User GetById(int Id) => userRepo.GetById(Id);
+        public User GetById(int Id) => _userRepo.GetById(Id);
         [HttpGet]
         public IActionResult GetUsers()
         {
-            var list = userRepo.GetAll().Select(u => new
+            var list = _userRepo.GetAll().Select(u => new
             {
                 u.Id, u.FullName,
                 u.Phone, u.Email,
@@ -41,7 +41,7 @@ namespace bicycle_store_web.Services
         [HttpPost]
         public IActionResult ChangePermisions(int Id)
         {
-            var user = userRepo.GetById(Id);
+            var user = _userRepo.GetById(Id);
             if (user.Photo == null)
                 user.Photo = Properties.Resources.admin;
             if (user != null)
@@ -51,21 +51,21 @@ namespace bicycle_store_web.Services
                 {
                     if (user.Photo == null)
                         user.Photo = Properties.Resources.admin;
-                    result = userRepo.Update(user);
+                    result = _userRepo.Update(user);
                 }
                 else if (user.Role == Roles.Admin.ToString())
                 {
                     if (user.Photo.SequenceEqual(Properties.Resources.admin))
                         user.Photo = Properties.Resources.user;
                     user.Role = Roles.User.ToString();
-                    result = userRepo.Update(user);
+                    result = _userRepo.Update(user);
                 }
                 else
                 {
                     if (user.Photo.SequenceEqual(Properties.Resources.user))
                         user.Photo = Properties.Resources.admin;
                     user.Role = Roles.Admin.ToString();
-                    result = userRepo.Update(user);
+                    result = _userRepo.Update(user);
                 }
                 if (result == true)
                     return new JsonResult(new { success = true, message = "Successfully changed" });
@@ -101,10 +101,10 @@ namespace bicycle_store_web.Services
             if (user.Id == 0)
             {
                 shopingCartService.CreateShopingCart(user.Id);
-                result = userRepo.Create(user);
+                result = _userRepo.Create(user);
             }
             else
-                result = userRepo.Update(user);
+                result = _userRepo.Update(user);
 
             if (result == true)
                 return new JsonResult(new { success = true, message = "Successfully changed" });
@@ -113,7 +113,7 @@ namespace bicycle_store_web.Services
         [HttpPost]
         public IActionResult DeleteUser(int Id)
         {
-            if (userRepo.Delete(Id))
+            if (_userRepo.Delete(Id))
                 return new JsonResult(new { success = true, message = "Successfully deleted" });
             return new JsonResult(new { success = false, message = "Error while deleting" });
         }

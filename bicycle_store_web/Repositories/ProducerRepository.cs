@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace bicycle_store_web.Repositories
 {
-    public class ProducerRepository : IGenericRepository<Producer>
+    public class ProducerRepository : IProducerRepository
     {
         public readonly bicycle_storeContext _db;
         public ProducerRepository(bicycle_storeContext _db)

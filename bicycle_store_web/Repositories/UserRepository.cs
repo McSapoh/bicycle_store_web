@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace bicycle_store_web.Repositories
 {
-    public class UserRepository : IGenericRepository<User>
+    public class UserRepository : IUserRepository
     {
         public readonly bicycle_storeContext _db;
         public UserRepository(bicycle_storeContext _db)

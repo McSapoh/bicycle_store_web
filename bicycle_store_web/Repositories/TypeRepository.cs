@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace bicycle_store_web.Repositories
 {
-    public class TypeRepository : IGenericRepository<Type>
+    public class TypeRepository : ITypeRepository
     {
         public readonly bicycle_storeContext _db;
         public TypeRepository(bicycle_storeContext _db)

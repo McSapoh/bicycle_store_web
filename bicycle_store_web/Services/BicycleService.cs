@@ -3,21 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using bicycle_store_web.Repositories;
+using bicycle_store_web.Interfaces;
+using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
     public class BicycleService
     {
-        private readonly BicycleRepository bicycleRepo;
-        public BicycleService(bicycle_storeContext context)
+        private readonly IBicycleRepository _bicycleRepo;
+        public BicycleService(IBicycleRepository bicycleRepo)
         {
-            bicycleRepo = new BicycleRepository(context);
+            _bicycleRepo = bicycleRepo;
         }
         [HttpGet]
         public Bicycle GetBicycle(int Id)
         {
-            var bicycle = bicycleRepo.GetById(Id);
+            var bicycle = _bicycleRepo.GetById(Id);
             if (bicycle == null)
                 return null;
             else
@@ -26,20 +27,27 @@ namespace bicycle_store_web.Services
         [HttpGet]
         public IActionResult GetBicycles()
         {
-            var list = bicycleRepo.GetAll().Select(b => new {
-                b.Id,b.Name,
-                b.WheelDiameter, b.Price,
-                b.Quantity, b.TypeId,
-                b.Type, b.CountryId,
-                b.Country, b.ProducerId,
+            var list = _bicycleRepo.GetAll().Select(b => new
+            {
+                b.Id,
+                b.Name,
+                b.WheelDiameter,
+                b.Price,
+                b.Quantity,
+                b.TypeId,
+                b.Type,
+                b.CountryId,
+                b.Country,
+                b.ProducerId,
                 b.Producer,
             }).ToList();
             return new JsonResult(new { data = list });
         }
+        public IActionResult GetBicyclesWithoutPhoto() => _bicycleRepo.GetAllWithoutPhoto();
         [HttpPost]
         public IActionResult DeleteBicycle(int Id)
         {
-            if (bicycleRepo.Delete(Id))
+            if (_bicycleRepo.Delete(Id))
                 return new JsonResult(new { success = false, message = "Error while Deleting" });
             return new JsonResult(new { success = true, message = "Delete successful" });
         }
@@ -59,14 +67,14 @@ namespace bicycle_store_web.Services
             }
 
             if (bicycle.Id == 0)
-                if (bicycleRepo.Create(bicycle))
+                if (_bicycleRepo.Create(bicycle))
                     return new JsonResult(new { success = true, message = "Successfully saved" });
             else
-                if (bicycleRepo.Update(bicycle))
+                if (_bicycleRepo.Update(bicycle))
                     return new JsonResult(new { success = true, message = "Successfully saved" });
 
             return new JsonResult(new { success = false, message = "Error while saving" });
         }
-        public SelectList GetSelectList() => bicycleRepo.GetSelectList();
+        public SelectList GetSelectList() => _bicycleRepo.GetSelectList();
     }
 }

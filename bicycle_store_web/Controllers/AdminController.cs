@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +18,6 @@ namespace bicycle_store_web.Controllers
         private readonly UserService userService;
         private readonly TypeService typeService;
         private readonly ProducerService producerService;
-        private IQueryable bicycles;
 
         [BindProperty]
         public Bicycle bicycle { get; set; }
@@ -33,19 +31,6 @@ namespace bicycle_store_web.Controllers
                 bicycleService.SaveBicycle(b, null);
             _db.SaveChanges();
         }
-        public void AddData()
-        {
-            bicycles = _db.Bicycles.AsNoTracking()
-                .Include(t => t.Type)
-                .Include(p => p.Producer)
-                .Include(c => c.Country);
-            foreach (Bicycle b in bicycles)
-            {
-                b.Type.Bicycles.Add(b);
-                b.Producer.Bicycles.Add(b);
-                b.Country.Bicycles.Add(b);
-            }
-        }
         public AdminController(ILogger<AdminController> logger, bicycle_storeContext context,
             BicycleService bicycleService, ProducerService producerService, TypeService typeService,
             UserService userService)
@@ -56,8 +41,6 @@ namespace bicycle_store_web.Controllers
             this.producerService = producerService;
             this.typeService = typeService;
             this.userService = userService;
-            AddData();
-            //AddImages();
         }
         [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Bicycles() => View();
@@ -119,12 +102,11 @@ namespace bicycle_store_web.Controllers
         // User actions
         [HttpGet]
         public IActionResult GetUsers() => userService.GetUsers();
-
         [HttpPost]
         public IActionResult ChangePermisions(int Id) => userService.ChangePermisions(Id);
         // Bicycle actions
         [HttpGet]
-        public IActionResult GetBicycles() => bicycleService.GetBicycles();
+        public IActionResult GetBicycles() => bicycleService.GetBicyclesWithoutPhoto();
         [HttpPost]
         public IActionResult DeleteBicycle(int Id) => bicycleService.DeleteBicycle(Id);
         [HttpPost]

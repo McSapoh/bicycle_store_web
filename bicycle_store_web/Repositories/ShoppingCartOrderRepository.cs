@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace bicycle_store_web.Repositories
 {
-    public class ShoppingCartOrderRepository : IGenericRepository<ShoppingCartOrder>
+    public class ShoppingCartOrderRepository : IShoppingCartOrderRepository
     {
         public readonly bicycle_storeContext _db;
         public ShoppingCartOrderRepository(bicycle_storeContext _db)

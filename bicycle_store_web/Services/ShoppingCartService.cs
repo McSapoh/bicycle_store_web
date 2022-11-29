@@ -1,4 +1,5 @@
-﻿using bicycle_store_web.Models;
+﻿using bicycle_store_web.Interfaces;
+using bicycle_store_web.Models;
 using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,30 +7,32 @@ namespace bicycle_store_web.Services
 {
     public class ShoppingCartService
     {
-        private readonly ShoppingCartOrderService shoppingCartOrderService;
-        private readonly ShoppingCartRepository shoppingCartRepo;
-        private readonly ShoppingCartOrderRepository shoppingCartOrderRepo;
-        public ShoppingCartService(bicycle_storeContext context, ShoppingCartOrderService shoppingCartOrderService)
+        private readonly ShoppingCartOrderService _shoppingCartOrderService;
+        private readonly IShoppingCartRepository _shoppingCartRepo;
+        private readonly IShoppingCartOrderRepository _shoppingCartOrderRepo;
+        public ShoppingCartService(ShoppingCartOrderService shoppingCartOrderService,
+            IShoppingCartRepository shoppingCartRepo,
+            IShoppingCartOrderRepository shoppingCartOrderRepo)
         {
-            this.shoppingCartOrderService = shoppingCartOrderService;
-            shoppingCartRepo = new ShoppingCartRepository(context);
-            shoppingCartOrderRepo = new ShoppingCartOrderRepository(context);
+            _shoppingCartOrderService = shoppingCartOrderService;
+            _shoppingCartRepo = shoppingCartRepo;
+            _shoppingCartOrderRepo = shoppingCartOrderRepo;
         }
         public void CreateShopingCart(int UserId) =>
-            shoppingCartRepo.Create(new ShoppingCart() { UserId = UserId });
+            _shoppingCartRepo.Create(new ShoppingCart() { UserId = UserId });
         public IActionResult AddToShoppingCart(int BicycleId, int UserId) => 
-            shoppingCartOrderService.SaveShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
+            _shoppingCartOrderService.SaveShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
         public IActionResult GetShoppingCart(int UserId) => 
-            shoppingCartOrderService.GetShoppingCartOrders(GetShoppingCartId(UserId));
+            _shoppingCartOrderService.GetShoppingCartOrders(GetShoppingCartId(UserId));
         public int GetShoppingCartId(int UserId) =>
-            shoppingCartRepo.GetShoppingCartId(UserId);
+            _shoppingCartRepo.GetShoppingCartId(UserId);
         public IActionResult RemoveFromShoppingCart(int BicycleId, int UserId) => 
-            shoppingCartOrderService.DeleteShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
+            _shoppingCartOrderService.DeleteShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
         public void ClearShoppingCart(int UserId)
         { 
-            var cartOrders = shoppingCartOrderRepo.GetAll(shoppingCartRepo.GetShoppingCartId(UserId));
+            var cartOrders = _shoppingCartOrderRepo.GetAll(_shoppingCartRepo.GetShoppingCartId(UserId));
             foreach (var cartOrder in cartOrders)
-                shoppingCartOrderService.DeleteShoppingCartOrder(cartOrder.BicycleId, cartOrder.ShoppingCartId);
+                _shoppingCartOrderService.DeleteShoppingCartOrder(cartOrder.BicycleId, cartOrder.ShoppingCartId);
         }
     }
 }

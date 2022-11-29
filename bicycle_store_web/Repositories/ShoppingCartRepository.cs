@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace bicycle_store_web.Repositories
 {
-    public class ShoppingCartRepository : IGenericRepository<ShoppingCart>
+    public class ShoppingCartRepository : IShoppingCartRepository
     {
         public readonly bicycle_storeContext _db;
         public ShoppingCartRepository(bicycle_storeContext _db)

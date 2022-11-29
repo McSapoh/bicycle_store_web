@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace bicycle_store_web.Repositories
 {
-    public class OrderRepository : IGenericRepository<Order>
+    public class OrderRepository : IOrderRepository
     {
         public readonly bicycle_storeContext _db;
         public OrderRepository(bicycle_storeContext _db)

@@ -1,4 +1,5 @@
-﻿using bicycle_store_web.Repositories;
+﻿using bicycle_store_web.Interfaces;
+using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
@@ -7,15 +8,15 @@ namespace bicycle_store_web.Services
 {
     public class TypeService
     {
-        private readonly TypeRepository typeRepo;
-        public TypeService(bicycle_storeContext context)
+        private readonly ITypeRepository _typeRepo;
+        public TypeService(ITypeRepository typeRepo)
         {
-            typeRepo = new TypeRepository(context);
+            _typeRepo = typeRepo;
         }
         [HttpGet]
         public Type GetById(int Id)
         {
-            var type = typeRepo.GetById(Id);
+            var type = _typeRepo.GetById(Id);
             if (type == null)
                 return null;
             else
@@ -24,7 +25,7 @@ namespace bicycle_store_web.Services
         [HttpGet]
         public IActionResult GetTypes()
         {
-            var list = typeRepo.GetAll().Select(p => new
+            var list = _typeRepo.GetAll().Select(p => new
             {
                 p.Id,
                 p.Name,
@@ -35,7 +36,7 @@ namespace bicycle_store_web.Services
         [HttpPost]
         public IActionResult DeleteType(int Id)
         {
-            if (typeRepo.Delete(Id))
+            if (_typeRepo.Delete(Id))
                 return new JsonResult(new { success = false, message = "Error while Deleting" });
             return new JsonResult(new { success = true, message = "Delete successful" });
         }
@@ -43,14 +44,14 @@ namespace bicycle_store_web.Services
         public IActionResult SaveType(Type type)
         {
             if (type.Id == 0)
-                if (typeRepo.Create(type))
+                if (_typeRepo.Create(type))
                     return new JsonResult(new { success = true, message = "Successfully saved" });
                 else
-                if (typeRepo.Update(type))
+                if (_typeRepo.Update(type))
                     return new JsonResult(new { success = true, message = "Successfully saved" });
 
             return new JsonResult(new { success = false, message = "Error while saving" });
         }
-        public SelectList GetSelectList() => typeRepo.GetSelectList();
+        public SelectList GetSelectList() => _typeRepo.GetSelectList();
     }
 }
