@@ -27,7 +27,7 @@ namespace BicycleStore.Tests
         [InlineData(false, "Error while Deleting")]
         public void BicycleService_DeleteBicycle_ReturnIActionResult(bool Success, string Message)
         {
-            // Arrange.
+            // Arrangef.
             repository.Setup(x => x.Delete(new int())).Returns(Success);
             bicycleService = new BicycleService(repository.Object);
             var typeResult = new JsonResult(new { success = Success, message = Message });
