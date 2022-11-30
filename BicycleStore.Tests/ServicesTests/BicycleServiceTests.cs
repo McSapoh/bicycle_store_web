@@ -3,6 +3,8 @@ using bicycle_store_web.Interfaces;
 using bicycle_store_web.Repositories;
 using bicycle_store_web.Services;
 using FakeItEasy;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
@@ -13,20 +15,30 @@ namespace BicycleStore.Tests
 {
     public class BicycleServiceTests
     {
-        //private readonly BicycleService bicycleService;
-        //public BicycleServiceTests()
-        //{
-        //    var IRepo = new Mock<IGenericRepository<Bicycle>>();
-        //    IRepo.Setup(x => x.Delete(1)).Returns(true);
-        //    bicycleService = new BicycleService(IRepo.Object);
+        private BicycleService bicycleService;
+        private Mock<IBicycleRepository> repository;
+        public BicycleServiceTests()
+        {
+            repository = new Mock<IBicycleRepository>();
+        }
 
-        //}
-        //[Theory]
-        //[InlineData(1)]
-        //public void BicycleService_DeleteBicycle_ReturnIActionResult(int id)
-        //{
-        //    var result = bicycleService.DeleteBicycle(id);
-        //    Assert.NotNull(result);
-        //}
+        [Theory]
+        [InlineData(true, "Delete successful")]
+        [InlineData(false, "Error while Deleting")]
+        public void BicycleService_DeleteBicycle_ReturnIActionResult(bool Success, string Message)
+        {
+            // Arrange.
+            repository.Setup(x => x.Delete(new int())).Returns(Success);
+            bicycleService = new BicycleService(repository.Object);
+            var typeResult = new JsonResult(new { success = Success, message = Message });
+            
+            // Act.
+            var result = (JsonResult)bicycleService.DeleteBicycle(new int());
+
+            // Assert.
+            Assert.NotNull(result);
+            Assert.IsType<JsonResult>(result);
+            result.Should().BeEquivalentTo(typeResult);
+        }
     }
 }

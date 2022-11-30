@@ -48,8 +48,8 @@ namespace bicycle_store_web.Services
         public IActionResult DeleteBicycle(int Id)
         {
             if (_bicycleRepo.Delete(Id))
-                return new JsonResult(new { success = false, message = "Error while Deleting" });
-            return new JsonResult(new { success = true, message = "Delete successful" });
+                return new JsonResult(new { success = true, message = "Delete successful" });
+            return new JsonResult(new { success = false, message = "Error while Deleting" });
         }
         [HttpPost]
         public IActionResult SaveBicycle(Bicycle bicycle, IFormFile Photo)
