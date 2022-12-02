@@ -13,6 +13,18 @@ namespace bicycle_store_web.Services
         {
             this._producerRepo = producerRepo;
         }
+        public string ValidateProducer(Producer producer)
+        {
+            var producerFromDb = _producerRepo.GetById(producer.Id);
+            if (producerFromDb != null)
+            {
+                if (producer.Name == producerFromDb.Name)
+                    if (producer.Description == producerFromDb.Description)
+                        return "There is no changes in current producer";
+                return null;
+            }
+            return "Producer is not exists in database";
+        }
         [HttpGet]
         public Producer GetById(int Id)
         {
@@ -34,24 +46,30 @@ namespace bicycle_store_web.Services
             return new JsonResult(new { data = list });
         }
         [HttpPost]
-        public IActionResult DeleteProducer(int Id)
+        public bool DeleteProducer(int Id)
         {
-            if (_producerRepo.Delete(Id))
-                return new JsonResult(new { success = false, message = "Error while Deleting" });
-            return new JsonResult(new { success = true, message = "Delete successful" });
+            _producerRepo.Delete(Id);
+            if (_producerRepo.GetById(Id) == null)
+                return true;
+            else
+                return false;
         }
         [HttpPost]
-        public IActionResult SaveProducer(Producer producer)
+        public bool SaveProducer(Producer producer)
         {
-            bool result;
             if (producer.Id == 0)
-                result = _producerRepo.Create(producer);
+            {
+                _producerRepo.Create(producer);
+                if (_producerRepo.GetById(producer.Id) != null)
+                    return true;
+            }
             else
-                result = _producerRepo.Update(producer);
-
-            if (result)
-                return new JsonResult(new { success = true, message = "Successfully saved" });
-            return new JsonResult(new { success = false, message = "Error while saving" });
+            {
+                _producerRepo.Update(producer);
+                if (_producerRepo.GetById(producer.Id) != null)
+                    return true;
+            }
+            return false;
         }
         public SelectList GetSelectList() => _producerRepo.GetSelectList();
     }

@@ -2,6 +2,7 @@
 using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Linq;
 
 namespace bicycle_store_web.Services
@@ -34,23 +35,30 @@ namespace bicycle_store_web.Services
             return new JsonResult(new { data = list });
         }
         [HttpPost]
-        public IActionResult DeleteType(int Id)
+        public bool DeleteType(int Id)
         {
-            if (_typeRepo.Delete(Id))
-                return new JsonResult(new { success = false, message = "Error while Deleting" });
-            return new JsonResult(new { success = true, message = "Delete successful" });
+            _typeRepo.Delete(Id);
+            if (_typeRepo.GetById(Id) == null)
+                return true;
+            else
+                return false;
         }
         [HttpPost]
-        public IActionResult SaveType(Type type)
+        public bool SaveType(Type type)
         {
             if (type.Id == 0)
-                if (_typeRepo.Create(type))
-                    return new JsonResult(new { success = true, message = "Successfully saved" });
-                else
-                if (_typeRepo.Update(type))
-                    return new JsonResult(new { success = true, message = "Successfully saved" });
-
-            return new JsonResult(new { success = false, message = "Error while saving" });
+            {
+                _typeRepo.Create(type);
+                if (_typeRepo.GetById(type.Id) != null)
+                    return true;
+            }
+            else
+            {
+                _typeRepo.Update(type);
+                if (_typeRepo.GetById(type.Id) != null)
+                    return true;
+            }
+            return false;
         }
         public SelectList GetSelectList() => _typeRepo.GetSelectList();
     }

@@ -23,19 +23,18 @@ namespace bicycle_store_web.Services
             }).ToList();
             return new JsonResult(new { data = list });
         }
-        public IActionResult SaveShoppingCartOrder(int BicycleId, int ShoppingCartId)
+        public bool SaveShoppingCartOrder(int BicycleId, int ShoppingCartId)
         {
             if (_shoppingCartOrderRepo.CheckExistence(ShoppingCartId) == false)
-                return new JsonResult(new { success = false, message = "Shopping cart does not exist" }); ;
-            bool result;
+                return false;
             if (_shoppingCartOrderRepo.CheckExistence(ShoppingCartId, BicycleId))
             {
                 var shoppingCartOrder = _shoppingCartOrderRepo.GetById(ShoppingCartId, BicycleId);
                 if (_bicycleService.GetBicycle(BicycleId).Quantity > shoppingCartOrder.Quantity)
                     shoppingCartOrder.Quantity++;
                 else
-                    return new JsonResult(new { success = false, message = "Cannot add more goods than we have" });
-                result = _shoppingCartOrderRepo.Update(shoppingCartOrder);
+                    return false;
+                _shoppingCartOrderRepo.Update(shoppingCartOrder);
             }
             else
             {
@@ -45,18 +44,18 @@ namespace bicycle_store_web.Services
                     Quantity = 1,
                     ShoppingCartId = ShoppingCartId
                 };
-                result = _shoppingCartOrderRepo.Create(shoppingCartOrder);
+                _shoppingCartOrderRepo.Create(shoppingCartOrder);
             }
-           if (result)
-                return new JsonResult(new { success = true, message = "Successfully saved" });
-            return new JsonResult(new { success = false, message = "Error while saving" });
+            return true;
         }
-        public IActionResult DeleteShoppingCartOrder(int BicycleId, int ShoppingCartId)
+        public bool DeleteShoppingCartOrder(int ShoppingCartOrderId)
         {
-            var shoppingCartOrder = _shoppingCartOrderRepo.GetById(ShoppingCartId, BicycleId);
-            if (_shoppingCartOrderRepo.Delete(shoppingCartOrder.Id))
-                return new JsonResult(new { success = true, message = "Successfully deleted" });
-            return new JsonResult(new { success = false, message = "Error while Deleting" });
+            var shoppingCartOrder = _shoppingCartOrderRepo.GetById(ShoppingCartOrderId);
+            _shoppingCartOrderRepo.Delete(shoppingCartOrder.Id);
+            if (_shoppingCartOrderRepo.GetById(ShoppingCartOrderId) != null)
+                return true;
+            else
+                return false;
         }
     }
 }

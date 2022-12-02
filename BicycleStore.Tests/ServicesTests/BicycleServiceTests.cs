@@ -6,6 +6,7 @@ using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.CompilerServices;
 using Moq;
 using System;
 using System.Configuration;
@@ -27,7 +28,7 @@ namespace BicycleStore.Tests
         [InlineData(false, "Error while Deleting")]
         public void BicycleService_DeleteBicycle_ReturnIActionResult(bool Success, string Message)
         {
-            // Arrangef.
+            // Arrange.
             repository.Setup(x => x.Delete(new int())).Returns(Success);
             bicycleService = new BicycleService(repository.Object);
             var typeResult = new JsonResult(new { success = Success, message = Message });

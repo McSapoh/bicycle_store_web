@@ -81,7 +81,7 @@ namespace bicycle_store_web.Services
                 TotalCost += (int)(CartOrder.Quantity * CartOrder.Bicycle.Price);
             return TotalCost;
         }
-        public IActionResult CreateOrder(int UserId)
+        public bool CreateOrder(int UserId)
         {
             var ShoppingCartId = shoppingCartService.GetShoppingCartId(UserId);
             var CartOrders = _shoppingCartOrderRepo.GetAll(ShoppingCartId);
@@ -98,35 +98,37 @@ namespace bicycle_store_web.Services
             {
                 var bicycle = bicycleService.GetBicycle(CartOrder.BicycleId);
                 bicycle.Quantity -= (uint)CartOrder.Quantity;
-                var res1 = _bicycleRepo.Update(bicycle);
-                var res2 = _bicycleOrderRepo.Create(new BicycleOrder()
+                _bicycleRepo.Update(bicycle);
+                _bicycleOrderRepo.Create(new BicycleOrder()
                 {
                     BicycleId = CartOrder.BicycleId,
                     Quantity = CartOrder.Quantity,
                     BicycleCost = (int)(CartOrder.Quantity * CartOrder.Bicycle.Price),
                     OrderId = Order.OrderId,
                 });
-                if (res1 || res2 == false)
-                    return new JsonResult(new { success = true, message = "Error while creating" });
             }
             shoppingCartService.ClearShoppingCart(UserId);
-            return new JsonResult(new { success = true, message = "Order successfully created" });
+            return true;
         }
-        public IActionResult SendOrder(int OrderId)
+        public bool SendOrder(int OrderId)
         {
             var order = _orderRepo.GetById(OrderId);
             order.Status = OrderStatus.Sended.ToString();
-            if (_orderRepo.Update(order))
-                return new JsonResult(new { success = true, message = "Successfully sended" });
-            return new JsonResult(new { success = false, message = "Error while sending" });
+            _orderRepo.Update(order);
+            if (_orderRepo.GetById(OrderId).Status == OrderStatus.Sended.ToString())
+                return true;
+            else
+                return false;
         }
-        public IActionResult ConfirmReceipt(int OrderId)
+        public bool ConfirmReceipt(int OrderId)
         {
             var order = _orderRepo.GetById(OrderId);
             order.Status = OrderStatus.Received.ToString();
-            if (_orderRepo.Update(order))
-                return new JsonResult(new { success = true, message = "Successfully sended" });
-            return new JsonResult(new { success = false, message = "Error while sending" });
+            _orderRepo.Update(order);
+            if (_orderRepo.GetById(OrderId).Status == OrderStatus.Received.ToString())
+                return true;
+            else
+                return false;
         }
     }
 }

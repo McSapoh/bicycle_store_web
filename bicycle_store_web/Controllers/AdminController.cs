@@ -103,50 +103,77 @@ namespace bicycle_store_web.Controllers
         [HttpGet]
         public IActionResult GetUsers() => userService.GetUsers();
         [HttpPost]
-        public IActionResult ChangePermisions(int Id) => userService.ChangePermisions(Id);
+        public IActionResult ChangePermisions(int Id)
+        {
+            if(userService.ChangePermisions(Id))
+                return new JsonResult(new { success = true, message = "Successfully saved" });
+            else
+                return Json(new { success = false, message = "Error while saving" });
+        }
         // Bicycle actions
         [HttpGet]
         public IActionResult GetBicycles() => bicycleService.GetBicyclesWithoutPhoto();
-        [HttpPost]
-        public IActionResult DeleteBicycle(int Id) => bicycleService.DeleteBicycle(Id);
+        public IActionResult DeleteBicycle(int Id)
+        {
+            if (bicycleService.DeleteBicycle(Id))
+                return new JsonResult(new { success = true, message = "Delete successful" });
+            else
+                return new JsonResult(new { success = false, message = "Error while Deleting" });
+        }
         [HttpPost]
         public IActionResult SaveBicycle(Bicycle bicycle, IFormFile Photo)
         {
             if (ModelState.IsValid)
-                return bicycleService.SaveBicycle(bicycle, Photo);
+            {
+                if (bicycleService.SaveBicycle(bicycle, Photo))
+                    return new JsonResult(new { success = true, message = "Successfully saved" });
+            }
+
             return Json(new { success = false, message = "Error while saving" });
         }
         [HttpGet]
         // Types actions
         [HttpGet]
         public IActionResult GetTypes() => typeService.GetTypes();
-        [HttpPost]
-        public IActionResult DeleteType(int Id) => typeService.DeleteType(Id);
+        public IActionResult DeleteType(int Id)
+        {
+            if (typeService.DeleteType(Id))
+                return new JsonResult(new { success = true, message = "Delete successful" });
+            else
+                return new JsonResult(new { success = false, message = "Error while Deleting" });
+        }
         [HttpPost]
         public IActionResult SaveType()
         {
             if (ModelState.IsValid)
-                return typeService.SaveType(type);
+            {
+                if (typeService.SaveType(type))
+                    return new JsonResult(new { success = true, message = "Successfully saved" });
+            }
+
             return Json(new { success = false, message = "Error while saving" });
         }
         // Producers actions
         [HttpGet]
         public IActionResult GetProducers() => producerService.GetProducers();
-        [HttpPost]
-        public IActionResult DeleteProducer(int Id) => producerService.DeleteProducer(Id);
+        public IActionResult DeleteProducer(int Id)
+        {
+            if (producerService.DeleteProducer(Id))
+                return new JsonResult(new { success = true, message = "Delete successful" });
+            else
+                return new JsonResult(new { success = false, message = "Error while Deleting" });
+        }
+
         [HttpPost]
         public IActionResult SaveProducer()
         {
             if (ModelState.IsValid)
-                return producerService.SaveProducer(producer);
+            {
+                if (producerService.SaveProducer(producer))
+                    return new JsonResult(new { success = true, message = "Successfully saved" });
+            }
+
             return Json(new { success = false, message = "Error while saving" });
-            //if (ModelState.IsValid) 
-            //{
-            //    if (producerService.Save(producer))
-            //        return Json(new { success = true, message = "Successfully saved" });
-            //    return Json(new { success = false, message = "Error while saving" });
-            //}
-            //return Json(new { success = false, message = "Error while saving" });
         }
         #endregion
     }

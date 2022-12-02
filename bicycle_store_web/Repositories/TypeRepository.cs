@@ -14,23 +14,20 @@ namespace bicycle_store_web.Repositories
         }
         public List<Type> GetAll() => _db.Types.ToList();
         public Type GetById(int Id) => _db.Types.FirstOrDefault(b => b.Id == Id);
-        public bool Create(Type item)
+        public void Create(Type item)
         {
             _db.Types.Add(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Update(Type item)
+        public void Update(Type item)
         {
             _db.Types.Update(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Delete(int Id)
+        public void Delete(int Id)
         {
             _db.Types.Remove(GetById(Id));
             _db.SaveChanges();
-            return true;
         }
         public SelectList GetSelectList() => new SelectList(_db.Types.ToList(), "Id", "Name");
     }

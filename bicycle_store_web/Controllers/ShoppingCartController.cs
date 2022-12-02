@@ -18,10 +18,19 @@ namespace bicycle_store_web.Controllers
         [HttpGet]
         public IActionResult GetShoppingCart() => 
             shoppingCartService.GetShoppingCart(userService.GetUserId(User.Identity.Name));
-        public IActionResult AddToShoppingCart(int BicycleId) => 
-            shoppingCartService.AddToShoppingCart(BicycleId, userService.GetUserId(User.Identity.Name));
-
-        public IActionResult RemoveFromShoppingCart(int BicycleId) =>
-            shoppingCartService.RemoveFromShoppingCart(BicycleId, userService.GetUserId(User.Identity.Name));
+        public IActionResult AddToShoppingCart(int BicycleId)
+        {
+            if(shoppingCartService.AddToShoppingCart(BicycleId, userService.GetUserId(User.Identity.Name)))
+                return new JsonResult(new { success = true, message = "Successfully added to shopping cart" });
+            else
+                return new JsonResult(new { success = false, message = "Error while adding to shopping cart" });
+        }
+        public IActionResult RemoveFromShoppingCart(int ShoppingCartOrderId)
+        {
+            if (shoppingCartService.RemoveFromShoppingCart(ShoppingCartOrderId))
+                return new JsonResult(new { success = true, message = "Successfully removed from shopping cart" });
+            else
+                return new JsonResult(new { success = false, message = "Error while removing from shopping cart" });
+        }
     }
 }

@@ -39,41 +39,44 @@ namespace bicycle_store_web.Services
             return new JsonResult(new { data = list });
         }
         [HttpPost]
-        public IActionResult ChangePermisions(int Id)
+        public bool ChangePermisions(int Id)
         {
             var user = _userRepo.GetById(Id);
+            string Role = null;
             if (user.Photo == null)
                 user.Photo = Properties.Resources.admin;
             if (user != null)
             {
-                bool result;
                 if (user.Role == Roles.SuperAdmin.ToString())
                 {
+                    Role = Roles.SuperAdmin.ToString();
                     if (user.Photo == null)
                         user.Photo = Properties.Resources.admin;
-                    result = _userRepo.Update(user);
+                    _userRepo.Update(user);
                 }
                 else if (user.Role == Roles.Admin.ToString())
                 {
+                    Role = Roles.User.ToString();
                     if (user.Photo.SequenceEqual(Properties.Resources.admin))
                         user.Photo = Properties.Resources.user;
-                    user.Role = Roles.User.ToString();
-                    result = _userRepo.Update(user);
+                    user.Role = Role;
+                    _userRepo.Update(user);
                 }
                 else
                 {
+                    Role = Roles.Admin.ToString();
                     if (user.Photo.SequenceEqual(Properties.Resources.user))
                         user.Photo = Properties.Resources.admin;
-                    user.Role = Roles.Admin.ToString();
-                    result = _userRepo.Update(user);
+                    user.Role = Role;
+                    _userRepo.Update(user);
                 }
-                if (result == true)
-                    return new JsonResult(new { success = true, message = "Successfully changed" });
+                if (_userRepo.GetById(Id).Role == Role)
+                    return true;
             }
-            return new JsonResult(new { success = false, message = "Error while changing" });
+            return false;
         }
         [HttpPost]
-        public IActionResult SaveUser(User user, IFormFile Photo)
+        public bool SaveUser(User user, IFormFile Photo)
         {
             if (user.Role == null)
                 user.Role = Roles.User.ToString();
@@ -97,25 +100,27 @@ namespace bicycle_store_web.Services
                 }
             }
 
-            bool result;
             if (user.Id == 0)
             {
                 shopingCartService.CreateShopingCart(user.Id);
-                result = _userRepo.Create(user);
+                _userRepo.Create(user);
             }
             else
-                result = _userRepo.Update(user);
+                _userRepo.Update(user);
 
-            if (result == true)
-                return new JsonResult(new { success = true, message = "Successfully changed" });
-            return new JsonResult(new { success = false, message = "Error while changing" });
+            if (_userRepo.GetById(user.Id) != null)
+                return true;
+            else
+                return false;
         }
         [HttpPost]
-        public IActionResult DeleteUser(int Id)
+        public bool DeleteUser(int Id)
         {
-            if (_userRepo.Delete(Id))
-                return new JsonResult(new { success = true, message = "Successfully deleted" });
-            return new JsonResult(new { success = false, message = "Error while deleting" });
+            _userRepo.Delete(Id);
+            if (_userRepo.GetById(Id) == null)
+                return true;
+            else
+                return false;
         }
         public ClaimsPrincipal GetClaims (User user)
         {

@@ -25,23 +25,20 @@ namespace bicycle_store_web.Repositories
             { id = 1; }
             return id;
         }
-        public bool Create(Order item)
+        public void Create(Order item)
         {
             _db.Orders.Add(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Update(Order item)
+        public void Update(Order item)
         {
             _db.Orders.Update(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Delete(int Id)
+        public void Delete(int Id)
         {
             _db.Orders.Remove(GetById(Id));
             _db.SaveChanges();
-            return true;
         }
     }
 }

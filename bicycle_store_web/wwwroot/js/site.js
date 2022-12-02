@@ -335,11 +335,11 @@ function addToCart(bicycleId) {
         }
     })
 }
-function removeFromCart(bicycleId) {
+function removeFromCart(shoppingCartOrderId) {
     $.ajax({
         type: 'POST',
         url: '/ShoppingCart/RemoveFromShoppingCart',
-        data: { BicycleId: bicycleId },
+        data: { ShoppingCartOrderId: shoppingCartOrderId },
         success: function (data) {
             if (data.success) {
                 $('#CartTable').DataTable().ajax.reload()

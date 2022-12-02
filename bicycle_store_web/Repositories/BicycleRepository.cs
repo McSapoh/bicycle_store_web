@@ -38,23 +38,20 @@ namespace bicycle_store_web.Repositories
             return new JsonResult(new { data = list });
         }
         public Bicycle GetById(int Id) => _db.Bicycles.FirstOrDefault(b => b.Id == Id);
-        public bool Create(Bicycle item)
+        public void Create(Bicycle item)
         {
             _db.Bicycles.Add(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Update(Bicycle item)
+        public void Update(Bicycle item)
         {
             _db.Bicycles.Update(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Delete(int Id)
+        public void Delete(int Id)
         {
             _db.Bicycles.Remove(GetById(Id));
             _db.SaveChanges();
-            return true;
         }
         public SelectList GetSelectList() => new SelectList(_db.Bicycles.ToList(), "Id", "Name");
     }

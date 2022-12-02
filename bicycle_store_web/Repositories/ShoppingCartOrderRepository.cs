@@ -22,23 +22,20 @@ namespace bicycle_store_web.Repositories
         public ShoppingCartOrder GetById(int Id) => _db.ShoppingCartOrders.FirstOrDefault(b => b.Id == Id);
         public ShoppingCartOrder GetById(int Id, int BicycleId) => 
             _db.ShoppingCartOrders.FirstOrDefault(o => o.ShoppingCartId == Id && o.BicycleId == BicycleId);
-        public bool Create(ShoppingCartOrder item)
+        public void Create(ShoppingCartOrder item)
         {
             _db.ShoppingCartOrders.Add(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Update(ShoppingCartOrder item)
+        public void Update(ShoppingCartOrder item)
         {
             _db.ShoppingCartOrders.Update(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Delete(int Id)
+        public void Delete(int Id)
         {
             _db.ShoppingCartOrders.Remove(GetById(Id));
             _db.SaveChanges();
-            return true;
         }
         public bool CheckExistence(int ShoppingCartId)
         {

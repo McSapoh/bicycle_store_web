@@ -11,7 +11,6 @@ namespace bicycle_store_web.Controllers
     {
         private readonly bicycle_storeContext _db;
         private readonly UserService userService;
-        private readonly BicycleService bicycleService;
         [BindProperty]
         public User user { get; set; }
         [BindProperty]
@@ -38,11 +37,10 @@ namespace bicycle_store_web.Controllers
             }
             return bicycles;
         }
-        public UserController(bicycle_storeContext context, UserService userService, BicycleService bicycleService)
+        public UserController(bicycle_storeContext context, UserService userService)
         {
             _db = context;
             this.userService = userService;
-            this.bicycleService = bicycleService;
             //AddImages();
         }
         public IActionResult Bicycles() => View("Bicycles", AddData());
@@ -53,14 +51,6 @@ namespace bicycle_store_web.Controllers
             else
                 user = new User();
             return View(user);
-        }
-        public IActionResult OrderCreating()
-        {
-            ViewBag.Bicycles = bicycleService.GetSelectList();
-            order = new Order();
-            var bicycleOrder = new BicycleOrder();
-            order.BicycleOrders.Add(bicycleOrder);
-            return View();
         }
         public IActionResult Register() {
             user = new User();
@@ -94,10 +84,20 @@ namespace bicycle_store_web.Controllers
         public IActionResult SaveUser(User user, IFormFile Photo)
         {
             if (ModelState.IsValid)
-                return userService.SaveUser(user, Photo);
+            {
+                if (userService.SaveUser(user, Photo))
+                    return new JsonResult(new { success = true, message = "Successfully saved" });
+            }
+
             return Json(new { success = false, message = "Error while saving" });
         }
-        public IActionResult DeleteUser(int Id) => userService.DeleteUser(Id);
+        public IActionResult DeleteUser(int Id)
+        {
+            if (userService.DeleteUser(Id))
+                return new JsonResult(new { success = true, message = "Delete successful" });
+            else
+                return new JsonResult(new { success = false, message = "Error while Deleting" });
+        }
         public IActionResult GetUserRole() => Json(new
         {
             data = userService.GetUserRole(userService.GetUserId(User.Identity.Name))

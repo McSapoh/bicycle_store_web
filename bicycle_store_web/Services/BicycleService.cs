@@ -45,14 +45,16 @@ namespace bicycle_store_web.Services
         }
         public IActionResult GetBicyclesWithoutPhoto() => _bicycleRepo.GetAllWithoutPhoto();
         [HttpPost]
-        public IActionResult DeleteBicycle(int Id)
+        public bool DeleteBicycle(int Id)
         {
-            if (_bicycleRepo.Delete(Id))
-                return new JsonResult(new { success = true, message = "Delete successful" });
-            return new JsonResult(new { success = false, message = "Error while Deleting" });
+            _bicycleRepo.Delete(Id);
+            if (_bicycleRepo.GetById(Id) == null)
+                return true;
+            else
+                return false;
         }
         [HttpPost]
-        public IActionResult SaveBicycle(Bicycle bicycle, IFormFile Photo)
+        public bool SaveBicycle(Bicycle bicycle, IFormFile Photo)
         {
             if (Photo == null)
                 bicycle.Photo = Properties.Resources.bicycle;
@@ -67,13 +69,18 @@ namespace bicycle_store_web.Services
             }
 
             if (bicycle.Id == 0)
-                if (_bicycleRepo.Create(bicycle))
-                    return new JsonResult(new { success = true, message = "Successfully saved" });
+            {
+                _bicycleRepo.Create(bicycle);
+                if (_bicycleRepo.GetById(bicycle.Id) != null)
+                    return true;
+            }
             else
-                if (_bicycleRepo.Update(bicycle))
-                    return new JsonResult(new { success = true, message = "Successfully saved" });
-
-            return new JsonResult(new { success = false, message = "Error while saving" });
+            {
+                _bicycleRepo.Update(bicycle);
+                if (_bicycleRepo.GetById(bicycle.Id) != null)
+                    return true;
+            }
+            return false;
         }
         public SelectList GetSelectList() => _bicycleRepo.GetSelectList();
     }

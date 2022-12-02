@@ -6,8 +6,8 @@ namespace bicycle_store_web.Interfaces
     {
         public T GetById(int Id);
         public List<T> GetAll();
-        public bool Create(T item);
-        public bool Update(T item);
-        public bool Delete(int Id);
+        public void Create(T item);
+        public void Update(T item);
+        public void Delete(int Id);
     }
 }

@@ -19,23 +19,20 @@ namespace bicycle_store_web.Repositories
         public List<BicycleOrder> GetAll(int OrderId) => _db.BicycleOrders.Include(b => b.Bicycle)
             .Where(bo => bo.OrderId == OrderId).ToList();
         public BicycleOrder GetById(int Id) => _db.BicycleOrders.FirstOrDefault(b => b.BicycleOrderId == Id);
-        public bool Create(BicycleOrder item)
+        public void Create(BicycleOrder item)
         {
             _db.BicycleOrders.Add(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Update(BicycleOrder item)
+        public void Update(BicycleOrder item)
         {
             _db.BicycleOrders.Update(item);
             _db.SaveChanges();
-            return true;
         }
-        public bool Delete(int Id)
+        public void Delete(int Id)
         {
             _db.BicycleOrders.Remove(GetById(Id));
             _db.SaveChanges();
-            return true;
         }
     }
 }

@@ -20,19 +20,26 @@ namespace bicycle_store_web.Services
         }
         public void CreateShopingCart(int UserId) =>
             _shoppingCartRepo.Create(new ShoppingCart() { UserId = UserId });
-        public IActionResult AddToShoppingCart(int BicycleId, int UserId) => 
+        public bool AddToShoppingCart(int BicycleId, int UserId)
+        {
             _shoppingCartOrderService.SaveShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
+            return true;
+        }
         public IActionResult GetShoppingCart(int UserId) => 
             _shoppingCartOrderService.GetShoppingCartOrders(GetShoppingCartId(UserId));
         public int GetShoppingCartId(int UserId) =>
             _shoppingCartRepo.GetShoppingCartId(UserId);
-        public IActionResult RemoveFromShoppingCart(int BicycleId, int UserId) => 
-            _shoppingCartOrderService.DeleteShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
+        public bool RemoveFromShoppingCart(int ShoppingCartOrderId)
+        {
+            _shoppingCartOrderService.DeleteShoppingCartOrder(ShoppingCartOrderId);
+            return true;
+        }
+
         public void ClearShoppingCart(int UserId)
         { 
             var cartOrders = _shoppingCartOrderRepo.GetAll(_shoppingCartRepo.GetShoppingCartId(UserId));
             foreach (var cartOrder in cartOrders)
-                _shoppingCartOrderService.DeleteShoppingCartOrder(cartOrder.BicycleId, cartOrder.ShoppingCartId);
+                _shoppingCartOrderService.DeleteShoppingCartOrder(cartOrder.Id);
         }
     }
 }
