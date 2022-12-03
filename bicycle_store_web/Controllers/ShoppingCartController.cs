@@ -1,6 +1,7 @@
 ﻿using bicycle_store_web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace bicycle_store_web.Controllers
 {
@@ -16,8 +17,18 @@ namespace bicycle_store_web.Controllers
         [Authorize]
         public IActionResult Index() => View();
         [HttpGet]
-        public IActionResult GetShoppingCart() => 
-            shoppingCartService.GetShoppingCart(userService.GetUserId(User.Identity.Name));
+        public IActionResult GetShoppingCart()
+        {
+            var list = shoppingCartService.GetShoppingCart(userService.GetUserId(User.Identity.Name)).
+                Select(o => new
+                {
+                    o.Id,
+                    o.Bicycle.Name,
+                    o.Bicycle.Price,
+                    o.Quantity
+                }).ToList();
+            return new JsonResult(new { data = list });
+        }
         public IActionResult AddToShoppingCart(int BicycleId)
         {
             if(shoppingCartService.AddToShoppingCart(BicycleId, userService.GetUserId(User.Identity.Name)))

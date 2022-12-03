@@ -1,15 +1,13 @@
 using bicycle_store_web;
 using bicycle_store_web.Interfaces;
-using bicycle_store_web.Repositories;
 using bicycle_store_web.Services;
-using FakeItEasy;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic.CompilerServices;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using System;
-using System.Configuration;
+using System.Collections;
+using System.Collections.Generic;
 using Xunit;
 
 namespace BicycleStore.Tests
@@ -24,22 +22,106 @@ namespace BicycleStore.Tests
         }
 
         [Theory]
-        [InlineData(true, "Delete successful")]
-        [InlineData(false, "Error while Deleting")]
-        public void BicycleService_DeleteBicycle_ReturnIActionResult(bool Success, string Message)
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GetBicycle_ReturnBicycle(bool BicycleIsNull)
         {
             // Arrange.
-            repository.Setup(x => x.Delete(new int())).Returns(Success);
+            Bicycle Bicycle = null;
+
+            if (!BicycleIsNull)
+                Bicycle = new Mock<Bicycle>().Object;
+
+            repository.Setup(x => x.GetById(It.IsAny<int>())).Returns(Bicycle);
             bicycleService = new BicycleService(repository.Object);
-            var typeResult = new JsonResult(new { success = Success, message = Message });
-            
+
             // Act.
-            var result = (JsonResult)bicycleService.DeleteBicycle(new int());
+            var Result = bicycleService.GetBicycle(new int());
 
             // Assert.
-            Assert.NotNull(result);
-            Assert.IsType<JsonResult>(result);
-            result.Should().BeEquivalentTo(typeResult);
+            Result.Should().BeEquivalentTo(Bicycle);
+        }
+
+        [Fact]
+        public void GetBicycles_ReturnList()
+        {
+            // Arrange.
+            var List = new List<Bicycle>();
+
+            repository.Setup(x => x.GetAll()).Returns(List);
+            bicycleService = new BicycleService(repository.Object);
+
+            // Act.
+            var Result = bicycleService.GetBicycles();
+
+            // Assert.
+            Assert.IsType<List<Bicycle>>(Result);
+            Result.Should().BeEquivalentTo(List);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void SaveBicycle_ReturnBool(bool BicycleIsNull, bool ExpectedResult)
+        {
+            // Arrange.
+            Bicycle Bicycle = null;
+            IFormFile Photo = null;
+
+            if (!BicycleIsNull)
+                Bicycle = new Bicycle();
+
+            repository.Setup(x => x.Create(It.IsAny<Bicycle>())).Verifiable();
+            repository.Setup(x => x.Update(It.IsAny<Bicycle>())).Verifiable();
+            repository.Setup(x => x.GetById(It.IsAny<int>())).Returns(Bicycle);
+            bicycleService = new BicycleService(repository.Object);
+
+            // Act.
+            var Result = bicycleService.SaveBicycle(new Bicycle(), Photo);
+
+            // Assert.
+            Assert.IsType<bool>(Result);
+            Assert.Equal(ExpectedResult, Result);
+        }
+
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(true, true)]
+        public void DeleteBicycle_ReturnBool(bool BicycleIsNull, bool ExpectedResult)
+        {
+            // Arrange.
+            Bicycle Bicycle = null;
+
+            if (!BicycleIsNull)
+                Bicycle = new Mock<Bicycle>().Object;
+
+            repository.Setup(x => x.Delete(It.IsAny<int>())).Verifiable();
+            repository.Setup(x => x.GetById(It.IsAny<int>())).Returns(Bicycle);
+            bicycleService = new BicycleService(repository.Object);
+            
+            // Act.
+            var Result = bicycleService.DeleteBicycle(new int());
+
+            // Assert.
+            Assert.IsType<bool>(Result);
+            Assert.Equal(ExpectedResult, Result);
+        }
+
+        [Fact]
+        public void GetSelectList_ReturnSelectList()
+        {
+            // Arrange.
+            var SelectList = new SelectList(new Mock<IEnumerable>().Object);
+
+            repository.Setup(x => x.GetSelectList()).Returns(SelectList);
+            bicycleService = new BicycleService(repository.Object);
+
+            // Act.
+            var Result = bicycleService.GetSelectList();
+
+            // Assert.
+            Assert.IsType<SelectList>(Result);
+            Result.Should().BeEquivalentTo(SelectList);
         }
     }
 }

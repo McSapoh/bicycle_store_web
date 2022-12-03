@@ -27,17 +27,7 @@ namespace bicycle_store_web.Services
         [HttpGet]
         public User GetById(int Id) => _userRepo.GetById(Id);
         [HttpGet]
-        public IActionResult GetUsers()
-        {
-            var list = _userRepo.GetAll().Select(u => new
-            {
-                u.Id, u.FullName,
-                u.Phone, u.Email,
-                u.Adress, u.Username,
-                u.Role, u.Photo
-            }).ToList();
-            return new JsonResult(new { data = list });
-        }
+        public List<User> GetUsers() => _userRepo.GetAll();
         [HttpPost]
         public bool ChangePermisions(int Id)
         {

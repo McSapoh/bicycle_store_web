@@ -1,7 +1,6 @@
 ﻿using bicycle_store_web.Interfaces;
 using bicycle_store_web.Migrations;
 using bicycle_store_web.Models;
-using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

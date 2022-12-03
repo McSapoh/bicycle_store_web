@@ -1,8 +1,7 @@
 ﻿using bicycle_store_web.Interfaces;
-using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
@@ -12,18 +11,6 @@ namespace bicycle_store_web.Services
         public ProducerService(IProducerRepository producerRepo)
         {
             this._producerRepo = producerRepo;
-        }
-        public string ValidateProducer(Producer producer)
-        {
-            var producerFromDb = _producerRepo.GetById(producer.Id);
-            if (producerFromDb != null)
-            {
-                if (producer.Name == producerFromDb.Name)
-                    if (producer.Description == producerFromDb.Description)
-                        return "There is no changes in current producer";
-                return null;
-            }
-            return "Producer is not exists in database";
         }
         [HttpGet]
         public Producer GetById(int Id)
@@ -35,16 +22,7 @@ namespace bicycle_store_web.Services
                 return producer;
         }
         [HttpGet]
-        public IActionResult GetProducers()
-        {
-            var list = _producerRepo.GetAll().Select(p => new
-            {
-                p.Id,
-                p.Name,
-                p.Description
-            }).ToList();
-            return new JsonResult(new { data = list });
-        }
+        public List<Producer> GetProducers() => _producerRepo.GetAll();
         [HttpPost]
         public bool DeleteProducer(int Id)
         {

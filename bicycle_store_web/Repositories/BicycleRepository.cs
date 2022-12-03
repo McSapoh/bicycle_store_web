@@ -18,25 +18,6 @@ namespace bicycle_store_web.Repositories
                 .Include(t => t.Type)
                 .Include(p => p.Producer)
                 .Include(c => c.Country).ToList();
-
-        public IActionResult GetAllWithoutPhoto()
-        {
-            var list = _db.Bicycles.Select(b => new
-            {
-                b.Id,
-                b.Name,
-                b.WheelDiameter,
-                b.Price,
-                b.Quantity,
-                b.TypeId,
-                b.Type,
-                b.CountryId,
-                b.Country,
-                b.ProducerId,
-                b.Producer,
-            }).ToList();
-            return new JsonResult(new { data = list });
-        }
         public Bicycle GetById(int Id) => _db.Bicycles.FirstOrDefault(b => b.Id == Id);
         public void Create(Bicycle item)
         {

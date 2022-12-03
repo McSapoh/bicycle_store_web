@@ -1,9 +1,7 @@
 ﻿using bicycle_store_web.Interfaces;
-using bicycle_store_web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
@@ -24,16 +22,7 @@ namespace bicycle_store_web.Services
                 return type;
         }
         [HttpGet]
-        public IActionResult GetTypes()
-        {
-            var list = _typeRepo.GetAll().Select(p => new
-            {
-                p.Id,
-                p.Name,
-                p.Description
-            }).ToList();
-            return new JsonResult(new { data = list });
-        }
+        public List<Type> GetTypes() => _typeRepo.GetAll();
         [HttpPost]
         public bool DeleteType(int Id)
         {

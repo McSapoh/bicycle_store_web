@@ -54,7 +54,6 @@ namespace bicycle_store_web.Controllers
         [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Users() 
         {
-
             var user = _db.Users.FirstOrDefault(u => u.Username == HttpContext.User.Identity.Name);
             ViewBag.Id = user.Id;
             return View();
@@ -101,7 +100,16 @@ namespace bicycle_store_web.Controllers
         #region API Calls
         // User actions
         [HttpGet]
-        public IActionResult GetUsers() => userService.GetUsers();
+        public IActionResult GetUsers()
+        {
+            var list = userService.GetUsers().Select(u => new
+            {
+                u.Id,u.FullName,
+                u.Phone, u.Email, u.Adress,
+                u.Username, u.Role, u.Photo
+            }).ToList();
+            return new JsonResult(new { data = list });
+        }
         [HttpPost]
         public IActionResult ChangePermisions(int Id)
         {
@@ -112,7 +120,24 @@ namespace bicycle_store_web.Controllers
         }
         // Bicycle actions
         [HttpGet]
-        public IActionResult GetBicycles() => bicycleService.GetBicyclesWithoutPhoto();
+        public IActionResult GetBicycles()
+        {
+            var list = bicycleService.GetBicycles().Select(b => new
+            {
+                b.Id,
+                b.Name,
+                b.WheelDiameter,
+                b.Price,
+                b.Quantity,
+                b.TypeId,
+                b.Type,
+                b.CountryId,
+                b.Country,
+                b.ProducerId,
+                b.Producer,
+            }).ToList();
+            return new JsonResult(new { data = list });
+        }
         public IActionResult DeleteBicycle(int Id)
         {
             if (bicycleService.DeleteBicycle(Id))
@@ -134,7 +159,16 @@ namespace bicycle_store_web.Controllers
         [HttpGet]
         // Types actions
         [HttpGet]
-        public IActionResult GetTypes() => typeService.GetTypes();
+        public IActionResult GetTypes()
+        {
+            var list = typeService.GetTypes().Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Description
+            }).ToList();
+            return new JsonResult(new { data = list }); ;
+        }
         public IActionResult DeleteType(int Id)
         {
             if (typeService.DeleteType(Id))
@@ -155,7 +189,16 @@ namespace bicycle_store_web.Controllers
         }
         // Producers actions
         [HttpGet]
-        public IActionResult GetProducers() => producerService.GetProducers();
+        public IActionResult GetProducers()
+        {
+            var list = producerService.GetProducers().Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Description
+            }).ToList();
+            return new JsonResult(new { data = list });
+        }
         public IActionResult DeleteProducer(int Id)
         {
             if (producerService.DeleteProducer(Id))
@@ -163,7 +206,6 @@ namespace bicycle_store_web.Controllers
             else
                 return new JsonResult(new { success = false, message = "Error while Deleting" });
         }
-
         [HttpPost]
         public IActionResult SaveProducer()
         {

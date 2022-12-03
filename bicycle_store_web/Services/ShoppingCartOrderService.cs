@@ -1,7 +1,6 @@
 ﻿using bicycle_store_web.Interfaces;
 using bicycle_store_web.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
@@ -14,15 +13,8 @@ namespace bicycle_store_web.Services
             _bicycleService = bicycleService;
             _shoppingCartOrderRepo = shoppingCartOrderRepo;
         }
-        public IActionResult GetShoppingCartOrders(int ShoppingCartId)
-        {
-            var list = _shoppingCartOrderRepo.GetAll(ShoppingCartId).Select(o => new
-            {
-                o.Id, o.Bicycle.Name,
-                o.Bicycle.Price, o.Quantity
-            }).ToList();
-            return new JsonResult(new { data = list });
-        }
+        public List<ShoppingCartOrder> GetShoppingCartOrders(int ShoppingCartId) =>
+            _shoppingCartOrderRepo.GetAll(ShoppingCartId);
         public bool SaveShoppingCartOrder(int BicycleId, int ShoppingCartId)
         {
             if (_shoppingCartOrderRepo.CheckExistence(ShoppingCartId) == false)

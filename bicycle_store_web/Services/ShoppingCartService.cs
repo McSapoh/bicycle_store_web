@@ -1,7 +1,6 @@
 ﻿using bicycle_store_web.Interfaces;
 using bicycle_store_web.Models;
-using bicycle_store_web.Repositories;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
@@ -25,7 +24,7 @@ namespace bicycle_store_web.Services
             _shoppingCartOrderService.SaveShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
             return true;
         }
-        public IActionResult GetShoppingCart(int UserId) => 
+        public List<ShoppingCartOrder> GetShoppingCart(int UserId) => 
             _shoppingCartOrderService.GetShoppingCartOrders(GetShoppingCartId(UserId));
         public int GetShoppingCartId(int UserId) =>
             _shoppingCartRepo.GetShoppingCartId(UserId);
@@ -34,7 +33,6 @@ namespace bicycle_store_web.Services
             _shoppingCartOrderService.DeleteShoppingCartOrder(ShoppingCartOrderId);
             return true;
         }
-
         public void ClearShoppingCart(int UserId)
         { 
             var cartOrders = _shoppingCartOrderRepo.GetAll(_shoppingCartRepo.GetShoppingCartId(UserId));

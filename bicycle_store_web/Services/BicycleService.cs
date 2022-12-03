@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,25 +24,7 @@ namespace bicycle_store_web.Services
                 return bicycle;
         }
         [HttpGet]
-        public IActionResult GetBicycles()
-        {
-            var list = _bicycleRepo.GetAll().Select(b => new
-            {
-                b.Id,
-                b.Name,
-                b.WheelDiameter,
-                b.Price,
-                b.Quantity,
-                b.TypeId,
-                b.Type,
-                b.CountryId,
-                b.Country,
-                b.ProducerId,
-                b.Producer,
-            }).ToList();
-            return new JsonResult(new { data = list });
-        }
-        public IActionResult GetBicyclesWithoutPhoto() => _bicycleRepo.GetAllWithoutPhoto();
+        public List<Bicycle> GetBicycles() => _bicycleRepo.GetAll();
         [HttpPost]
         public bool DeleteBicycle(int Id)
         {
@@ -69,18 +50,14 @@ namespace bicycle_store_web.Services
             }
 
             if (bicycle.Id == 0)
-            {
                 _bicycleRepo.Create(bicycle);
-                if (_bicycleRepo.GetById(bicycle.Id) != null)
-                    return true;
-            }
             else
-            {
                 _bicycleRepo.Update(bicycle);
-                if (_bicycleRepo.GetById(bicycle.Id) != null)
-                    return true;
-            }
-            return false;
+
+            if (_bicycleRepo.GetById(bicycle.Id) != null)
+                return true;
+            else
+                return false;
         }
         public SelectList GetSelectList() => _bicycleRepo.GetSelectList();
     }

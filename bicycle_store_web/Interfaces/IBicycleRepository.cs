@@ -5,7 +5,6 @@ namespace bicycle_store_web.Interfaces
 {
     public interface IBicycleRepository : IGenericRepository<Bicycle>
     {
-        public IActionResult GetAllWithoutPhoto();
         public SelectList GetSelectList();
     }
 }
