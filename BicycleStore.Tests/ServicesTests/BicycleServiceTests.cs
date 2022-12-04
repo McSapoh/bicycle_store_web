@@ -10,15 +10,17 @@ using System.Collections;
 using System.Collections.Generic;
 using Xunit;
 
-namespace BicycleStore.Tests
+namespace BicycleStore.Tests.ServicesTests
 {
     public class BicycleServiceTests
     {
         private BicycleService bicycleService;
         private Mock<IBicycleRepository> repository;
+        public Bicycle Bicycle { get; set; }
         public BicycleServiceTests()
         {
             repository = new Mock<IBicycleRepository>();
+            Bicycle = null;
         }
 
         [Theory]
@@ -27,8 +29,6 @@ namespace BicycleStore.Tests
         public void GetBicycle_ReturnBicycle(bool BicycleIsNull)
         {
             // Arrange.
-            Bicycle Bicycle = null;
-
             if (!BicycleIsNull)
                 Bicycle = new Mock<Bicycle>().Object;
 
@@ -65,7 +65,6 @@ namespace BicycleStore.Tests
         public void SaveBicycle_ReturnBool(bool BicycleIsNull, bool ExpectedResult)
         {
             // Arrange.
-            Bicycle Bicycle = null;
             IFormFile Photo = null;
 
             if (!BicycleIsNull)
@@ -90,8 +89,6 @@ namespace BicycleStore.Tests
         public void DeleteBicycle_ReturnBool(bool BicycleIsNull, bool ExpectedResult)
         {
             // Arrange.
-            Bicycle Bicycle = null;
-
             if (!BicycleIsNull)
                 Bicycle = new Mock<Bicycle>().Object;
 
