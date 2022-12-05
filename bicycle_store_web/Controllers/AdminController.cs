@@ -1,5 +1,5 @@
-﻿using bicycle_store_web.Models;
-using bicycle_store_web.Services;
+﻿using bicycle_store_web.Interfaces;
+using bicycle_store_web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +14,10 @@ namespace bicycle_store_web.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly bicycle_storeContext _db;
-        private readonly BicycleService bicycleService;
-        private readonly UserService userService;
-        private readonly TypeService typeService;
-        private readonly ProducerService producerService;
+        private readonly IBicycleService bicycleService;
+        private readonly IUserService userService;
+        private readonly ITypeService typeService;
+        private readonly IProducerService producerService;
 
         [BindProperty]
         public Bicycle bicycle { get; set; }
@@ -32,8 +32,8 @@ namespace bicycle_store_web.Controllers
             _db.SaveChanges();
         }
         public AdminController(ILogger<AdminController> logger, bicycle_storeContext context,
-            BicycleService bicycleService, ProducerService producerService, TypeService typeService,
-            UserService userService)
+            IBicycleService bicycleService, IProducerService producerService, ITypeService typeService,
+            IUserService userService)
         {
             _logger = logger;
             _db = context;
@@ -120,24 +120,8 @@ namespace bicycle_store_web.Controllers
         }
         // Bicycle actions
         [HttpGet]
-        public IActionResult GetBicycles()
-        {
-            var list = bicycleService.GetBicycles().Select(b => new
-            {
-                b.Id,
-                b.Name,
-                b.WheelDiameter,
-                b.Price,
-                b.Quantity,
-                b.TypeId,
-                b.Type,
-                b.CountryId,
-                b.Country,
-                b.ProducerId,
-                b.Producer,
-            }).ToList();
-            return new JsonResult(new { data = list });
-        }
+        public IActionResult GetBicycles() =>
+            new JsonResult(new { data = bicycleService.GetBicyclesWithoutPhoto() });
         public IActionResult DeleteBicycle(int Id)
         {
             if (bicycleService.DeleteBicycle(Id))

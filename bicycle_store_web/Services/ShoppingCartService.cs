@@ -4,18 +4,15 @@ using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
-    public class ShoppingCartService
+    public class ShoppingCartService : IShoppingCartService
     {
-        private readonly ShoppingCartOrderService _shoppingCartOrderService;
+        private readonly IShoppingCartOrderService _shoppingCartOrderService;
         private readonly IShoppingCartRepository _shoppingCartRepo;
-        private readonly IShoppingCartOrderRepository _shoppingCartOrderRepo;
-        public ShoppingCartService(ShoppingCartOrderService shoppingCartOrderService,
-            IShoppingCartRepository shoppingCartRepo,
-            IShoppingCartOrderRepository shoppingCartOrderRepo)
+        public ShoppingCartService(IShoppingCartOrderService shoppingCartOrderService,
+            IShoppingCartRepository shoppingCartRepo)
         {
             _shoppingCartOrderService = shoppingCartOrderService;
             _shoppingCartRepo = shoppingCartRepo;
-            _shoppingCartOrderRepo = shoppingCartOrderRepo;
         }
         public void CreateShopingCart(int UserId) =>
             _shoppingCartRepo.Create(new ShoppingCart() { UserId = UserId });
@@ -35,7 +32,8 @@ namespace bicycle_store_web.Services
         }
         public void ClearShoppingCart(int UserId)
         { 
-            var cartOrders = _shoppingCartOrderRepo.GetAll(_shoppingCartRepo.GetShoppingCartId(UserId));
+            var cartOrders = _shoppingCartOrderService.GetShoppingCartOrders
+                (_shoppingCartRepo.GetShoppingCartId(UserId));
             foreach (var cartOrder in cartOrders)
                 _shoppingCartOrderService.DeleteShoppingCartOrder(cartOrder.Id);
         }

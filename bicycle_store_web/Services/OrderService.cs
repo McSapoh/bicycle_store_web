@@ -8,15 +8,15 @@ using System.Linq;
 
 namespace bicycle_store_web.Services
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
-        private readonly ShoppingCartService shoppingCartService;
-        private readonly BicycleService bicycleService;
+        private readonly IShoppingCartService shoppingCartService;
+        private readonly IBicycleService bicycleService;
         private readonly IOrderRepository _orderRepo;
         private readonly IBicycleRepository _bicycleRepo;
         private readonly IBicycleOrderRepository _bicycleOrderRepo;
         private readonly IShoppingCartOrderRepository _shoppingCartOrderRepo;
-        public OrderService(BicycleService bicycleService, ShoppingCartService shoppingCartService, 
+        public OrderService(IBicycleService bicycleService, IShoppingCartService shoppingCartService, 
             IOrderRepository orderRepo, IBicycleRepository bicycleRepo,
             IBicycleOrderRepository bicycleOrderRepo, IShoppingCartOrderRepository shoppingCartOrderRepo)
         {
@@ -27,7 +27,7 @@ namespace bicycle_store_web.Services
             _bicycleOrderRepo = bicycleOrderRepo;
             _shoppingCartOrderRepo = shoppingCartOrderRepo;
         }
-        public IActionResult GetAdminOrders()
+        public List<BicycleOrder> GetAdminOrders()
         {
             var UserOrders = _orderRepo.GetAll();
             var UserBicycleOrders = new List<BicycleOrder>();
@@ -39,18 +39,9 @@ namespace bicycle_store_web.Services
                     UserBicycleOrders.Add(bicycleOrder);
                 }
             }
-            var ResultList = UserBicycleOrders.Select(o => new
-            {
-                o.OrderId,
-                o.Bicycle.Name,
-                o.Quantity,
-                o.BicycleCost,
-                o.Order.Status,
-                o.Order.User.FullName
-            }).ToList();
-            return new JsonResult(new { data = ResultList });
+            return UserBicycleOrders;
         }
-        public IActionResult GetUserOrders(int UserId)
+        public List<BicycleOrder> GetUserOrders(int UserId)
         {
             var UserOrders = _orderRepo.GetAll(UserId);
             var UserBicycleOrders = new List<BicycleOrder>();
@@ -62,16 +53,7 @@ namespace bicycle_store_web.Services
                     UserBicycleOrders.Add(bicycleOrder);
                 }
             }
-            var ResultList = UserBicycleOrders.Select(o => new
-            {
-                o.OrderId,
-                o.Bicycle.Name,
-                o.Quantity,
-                o.BicycleCost,
-                o.Order.Status,
-                o.Order.UserId,
-            }).ToList();
-            return new JsonResult(new { data = ResultList });
+            return UserBicycleOrders;
         }
         public int GetTotalCost(List<ShoppingCartOrder> CartOrders)
         {

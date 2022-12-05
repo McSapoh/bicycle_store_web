@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
-    public class TypeService
+    public class TypeService : ITypeService
     {
         private readonly ITypeRepository _typeRepo;
         public TypeService(ITypeRepository typeRepo)

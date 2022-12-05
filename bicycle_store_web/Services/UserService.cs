@@ -11,11 +11,11 @@ using bicycle_store_web.Interfaces;
 
 namespace bicycle_store_web.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private readonly ShoppingCartService shopingCartService;
+        private readonly IShoppingCartService shopingCartService;
         private readonly IUserRepository _userRepo;
-        public UserService(ShoppingCartService shopingCartService, IUserRepository userRepo)
+        public UserService(IShoppingCartService shopingCartService, IUserRepository userRepo)
         {
             this.shopingCartService = shopingCartService;
             _userRepo = userRepo;

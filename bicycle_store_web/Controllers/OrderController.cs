@@ -1,13 +1,14 @@
-﻿using bicycle_store_web.Services;
+﻿using bicycle_store_web.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace bicycle_store_web.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly UserService userService;
-        private readonly OrderService orderService;
-        public OrderController(UserService userService, OrderService orderService)
+        private readonly IUserService userService;
+        private readonly IOrderService orderService;
+        public OrderController(IUserService userService, IOrderService orderService)
         {
             this.userService = userService;
             this.orderService = orderService;
@@ -15,11 +16,34 @@ namespace bicycle_store_web.Controllers
         public IActionResult UserOrders() => View();
         public IActionResult AdminOrders() => View();
         [HttpGet]
-        public IActionResult GetAdminOrders() =>
-            orderService.GetAdminOrders();
+        public IActionResult GetAdminOrders()
+        {
+            var ResultList = orderService.GetAdminOrders().Select(o => new
+            {
+                o.OrderId,
+                o.Bicycle.Name,
+                o.Quantity,
+                o.BicycleCost,
+                o.Order.Status,
+                o.Order.User.FullName
+            }).ToList();
+            return new JsonResult(new { data = ResultList });
+        }
         [HttpGet]
-        public IActionResult GetUserOrders() => 
-            orderService.GetUserOrders(userService.GetUserId(User.Identity.Name));
+        public IActionResult GetUserOrders()
+        {
+            var ResultList = orderService.GetUserOrders(userService.GetUserId(User.Identity.Name))
+                .Select(o => new
+                {
+                    o.OrderId,
+                    o.Bicycle.Name,
+                    o.Quantity,
+                    o.BicycleCost,
+                    o.Order.Status,
+                    o.Order.UserId,
+                }).ToList();
+            return new JsonResult(new { data = ResultList });
+        }
         [HttpPost]
         public IActionResult CreateOrder()
         {

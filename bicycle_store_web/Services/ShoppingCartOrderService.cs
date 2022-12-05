@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
-    public class ShoppingCartOrderService
+    public class ShoppingCartOrderService : IShoppingCartOrderService
     {
-        private readonly BicycleService _bicycleService;
+        private readonly IBicycleService _bicycleService;
         private readonly IShoppingCartOrderRepository _shoppingCartOrderRepo;
-        public ShoppingCartOrderService(IShoppingCartOrderRepository shoppingCartOrderRepo, BicycleService bicycleService)
+        public ShoppingCartOrderService(IShoppingCartOrderRepository shoppingCartOrderRepo, IBicycleService bicycleService)
         {
             _bicycleService = bicycleService;
             _shoppingCartOrderRepo = shoppingCartOrderRepo;

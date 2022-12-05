@@ -8,6 +8,7 @@ using Moq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace BicycleStore.Tests.ServicesTests
@@ -46,6 +47,31 @@ namespace BicycleStore.Tests.ServicesTests
         public void GetBicycles_ReturnList()
         {
             // Arrange.
+            var List = new List<Bicycle>();
+
+            repository.Setup(x => x.GetAll()).Returns(List);
+            bicycleService = new BicycleService(repository.Object);
+
+            // Act.
+            var Result = bicycleService.GetBicycles();
+
+            // Assert.
+            Assert.IsType<List<Bicycle>>(Result);
+            Result.Should().BeEquivalentTo(List);
+        }
+
+        [Fact]
+        public void GetBicyclesWithoutPhoto_ReturnAnonymousList()
+        {
+            // Arrange.
+            //var _db = new Mock<bicycle_storeContext>().Object;
+            //var List = _db.Bicycles.Select(b => new
+            //{
+            //    b.Id, b.Name,
+            //    b.WheelDiameter, b.Price, b.Quantity,
+            //    b.TypeId, b.Type, b.CountryId,
+            //    b.Country, b.ProducerId, b.Producer,
+            //}).ToList();
             var List = new List<Bicycle>();
 
             repository.Setup(x => x.GetAll()).Returns(List);

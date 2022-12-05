@@ -31,13 +31,13 @@ namespace bicycle_store_web
             services.AddControllersWithViews();
 
             // Adding services
-            services.AddScoped<BicycleService>();
-            services.AddScoped<TypeService>();
-            services.AddScoped<ProducerService>();
-            services.AddScoped<UserService>();
-            services.AddScoped<ShoppingCartService>();
-            services.AddScoped<ShoppingCartOrderService>();
-            services.AddScoped<OrderService>();
+            services.AddScoped<IBicycleService, BicycleService>();
+            services.AddScoped<ITypeService, TypeService>();
+            services.AddScoped<IProducerService, ProducerService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IShoppingCartService, ShoppingCartService>();
+            services.AddScoped<IShoppingCartOrderService, ShoppingCartOrderService>();
+            services.AddScoped<IOrderService, OrderService>();
 
             // Adding repositories
             services.AddScoped<IBicycleRepository, BicycleRepository>();

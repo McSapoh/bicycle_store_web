@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
-    public class BicycleService
+    public class BicycleService : IBicycleService
     {
         private readonly IBicycleRepository _bicycleRepo;
         public BicycleService(IBicycleRepository bicycleRepo)
@@ -25,6 +25,7 @@ namespace bicycle_store_web.Services
         }
         [HttpGet]
         public List<Bicycle> GetBicycles() => _bicycleRepo.GetAll();
+        public dynamic GetBicyclesWithoutPhoto() => _bicycleRepo.GetAllWithoutPhoto();
         [HttpPost]
         public bool DeleteBicycle(int Id)
         {

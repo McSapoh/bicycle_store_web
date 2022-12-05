@@ -1,4 +1,4 @@
-﻿using bicycle_store_web.Services;
+﻿using bicycle_store_web.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -7,9 +7,9 @@ namespace bicycle_store_web.Controllers
 {
     public class ShoppingCartController : Controller
     {
-        private readonly ShoppingCartService shoppingCartService;
-        private readonly UserService userService;
-        public ShoppingCartController(ShoppingCartService shoppingCartService, UserService userService)
+        private readonly IShoppingCartService shoppingCartService;
+        private readonly IUserService userService;
+        public ShoppingCartController(IShoppingCartService shoppingCartService, IUserService userService)
         {
             this.shoppingCartService = shoppingCartService;
             this.userService = userService;

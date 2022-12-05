@@ -1,4 +1,4 @@
-﻿using bicycle_store_web.Services;
+﻿using bicycle_store_web.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,8 @@ namespace bicycle_store_web.Controllers
     public class UserController : Controller
     {
         private readonly bicycle_storeContext _db;
-        private readonly UserService userService;
+        private readonly IUserService _userService;
+        private readonly IBicycleService _bicycleService;
         [BindProperty]
         public User user { get; set; }
         [BindProperty]
@@ -37,17 +38,18 @@ namespace bicycle_store_web.Controllers
             }
             return bicycles;
         }
-        public UserController(bicycle_storeContext context, UserService userService)
+        public UserController(bicycle_storeContext context, IUserService _userService, IBicycleService _bicycleService)
         {
             _db = context;
-            this.userService = userService;
+            this._userService = _userService;
+            this._bicycleService = _bicycleService;
             //AddImages();
         }
-        public IActionResult Bicycles() => View("Bicycles", AddData());
+        public IActionResult Bicycles() => View("Bicycles", _bicycleService.GetBicycles());
         public IActionResult SetProfile() 
         {
             if (User.Identity.IsAuthenticated)
-                user = userService.GetById(userService.GetUserId(User.Identity.Name));
+                user = _userService.GetById(_userService.GetUserId(User.Identity.Name));
             else
                 user = new User();
             return View(user);
@@ -70,10 +72,10 @@ namespace bicycle_store_web.Controllers
         [HttpPost("User/Login")]
         public IActionResult IsLogin(string Username, string Password, string ReturnUrl)
         {
-            user = userService.GetById(userService.GetUserId(Username));
+            user = _userService.GetById(_userService.GetUserId(Username));
             if(user != null && user.Password == Password)
             {
-                HttpContext.SignInAsync(userService.GetClaims(user));
+                HttpContext.SignInAsync(_userService.GetClaims(user));
                 if ((user.Role == "Admin" || user.Role == "SuperAdmin") && ReturnUrl == null)
                     return Redirect("/Admin/Bicycles");
                 return Redirect(ReturnUrl ?? "Bicycles");
@@ -85,7 +87,7 @@ namespace bicycle_store_web.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (userService.SaveUser(user, Photo))
+                if (_userService.SaveUser(user, Photo))
                     return new JsonResult(new { success = true, message = "Successfully saved" });
             }
 
@@ -93,18 +95,18 @@ namespace bicycle_store_web.Controllers
         }
         public IActionResult DeleteUser(int Id)
         {
-            if (userService.DeleteUser(Id))
+            if (_userService.DeleteUser(Id))
                 return new JsonResult(new { success = true, message = "Delete successful" });
             else
                 return new JsonResult(new { success = false, message = "Error while Deleting" });
         }
         public IActionResult GetUserRole() => Json(new
         {
-            data = userService.GetUserRole(userService.GetUserId(User.Identity.Name))
+            data = _userService.GetUserRole(_userService.GetUserId(User.Identity.Name))
         });
         public IActionResult GetUserId() => Json(new
         {
-            data = userService.GetUserId(User.Identity.Name)
+            data = _userService.GetUserId(User.Identity.Name)
         });
     }
 }

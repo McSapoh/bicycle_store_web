@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace bicycle_store_web.Services
 {
-    public class ProducerService
+    public class ProducerService : IProducerService
     {
         private readonly IProducerRepository _producerRepo;
         public ProducerService(IProducerRepository producerRepo)
