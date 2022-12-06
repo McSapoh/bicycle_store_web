@@ -33,10 +33,10 @@ namespace bicycle_store_web.Services
         {
             var user = _userRepo.GetById(Id);
             string Role = null;
-            if (user.Photo == null)
-                user.Photo = Properties.Resources.admin;
             if (user != null)
             {
+                if (user.Photo == null)
+                    user.Photo = Properties.Resources.admin;
                 if (user.Role == Roles.SuperAdmin.ToString())
                 {
                     Role = Roles.SuperAdmin.ToString();
