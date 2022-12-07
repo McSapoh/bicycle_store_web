@@ -16,20 +16,14 @@ namespace bicycle_store_web.Services
         }
         public void CreateShopingCart(int UserId) =>
             _shoppingCartRepo.Create(new ShoppingCart() { UserId = UserId });
-        public bool AddToShoppingCart(int BicycleId, int UserId)
-        {
+        public bool AddToShoppingCart(int BicycleId, int UserId) => 
             _shoppingCartOrderService.SaveShoppingCartOrder(BicycleId, GetShoppingCartId(UserId));
-            return true;
-        }
         public List<ShoppingCartOrder> GetShoppingCart(int UserId) => 
             _shoppingCartOrderService.GetShoppingCartOrders(GetShoppingCartId(UserId));
         public int GetShoppingCartId(int UserId) =>
             _shoppingCartRepo.GetShoppingCartId(UserId);
-        public bool RemoveFromShoppingCart(int ShoppingCartOrderId)
-        {
+        public bool RemoveFromShoppingCart(int ShoppingCartOrderId) => 
             _shoppingCartOrderService.DeleteShoppingCartOrder(ShoppingCartOrderId);
-            return true;
-        }
         public void ClearShoppingCart(int UserId)
         { 
             var cartOrders = _shoppingCartOrderService.GetShoppingCartOrders
