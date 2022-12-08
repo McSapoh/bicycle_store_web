@@ -15,17 +15,15 @@ namespace bicycle_store_web.Services
         private readonly IOrderRepository _orderRepo;
         private readonly IBicycleRepository _bicycleRepo;
         private readonly IBicycleOrderRepository _bicycleOrderRepo;
-        private readonly IShoppingCartOrderRepository _shoppingCartOrderRepo;
         public OrderService(IBicycleService bicycleService, IShoppingCartService shoppingCartService, 
             IOrderRepository orderRepo, IBicycleRepository bicycleRepo,
-            IBicycleOrderRepository bicycleOrderRepo, IShoppingCartOrderRepository shoppingCartOrderRepo)
+            IBicycleOrderRepository bicycleOrderRepo)
         {
             this.shoppingCartService = shoppingCartService;
             this.bicycleService = bicycleService;
             _orderRepo = orderRepo;
             _bicycleRepo = bicycleRepo;
             _bicycleOrderRepo = bicycleOrderRepo;
-            _shoppingCartOrderRepo = shoppingCartOrderRepo;
         }
         public List<BicycleOrder> GetAdminOrders()
         {
@@ -65,7 +63,7 @@ namespace bicycle_store_web.Services
         public bool CreateOrder(int UserId)
         {
             var ShoppingCartId = shoppingCartService.GetShoppingCartId(UserId);
-            var CartOrders = _shoppingCartOrderRepo.GetAll(ShoppingCartId);
+            var CartOrders = shoppingCartService.GetShoppingCart(ShoppingCartId);
             var Order = new Order()
             {
                 Data = DateTime.Now,
@@ -94,22 +92,30 @@ namespace bicycle_store_web.Services
         public bool SendOrder(int OrderId)
         {
             var order = _orderRepo.GetById(OrderId);
-            order.Status = OrderStatus.Sended.ToString();
-            _orderRepo.Update(order);
-            if (_orderRepo.GetById(OrderId).Status == OrderStatus.Sended.ToString())
-                return true;
-            else
-                return false;
+            if (order != null)
+            {
+                order.Status = OrderStatus.Sended.ToString();
+                _orderRepo.Update(order);
+                if (_orderRepo.GetById(OrderId).Status == OrderStatus.Sended.ToString())
+                    return true;
+                else
+                    return false;
+            }
+            return false;
         }
         public bool ConfirmReceipt(int OrderId)
         {
             var order = _orderRepo.GetById(OrderId);
-            order.Status = OrderStatus.Received.ToString();
-            _orderRepo.Update(order);
-            if (_orderRepo.GetById(OrderId).Status == OrderStatus.Received.ToString())
-                return true;
-            else
-                return false;
+            if (order != null)
+            {
+                order.Status = OrderStatus.Received.ToString();
+                _orderRepo.Update(order);
+                if (_orderRepo.GetById(OrderId).Status == OrderStatus.Received.ToString())
+                    return true;
+                else
+                    return false;
+            }
+            return false;
         }
     }
 }
