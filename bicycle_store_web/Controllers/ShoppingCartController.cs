@@ -1,6 +1,7 @@
 ﻿using bicycle_store_web.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System.Linq;
 
 namespace bicycle_store_web.Controllers
@@ -19,7 +20,9 @@ namespace bicycle_store_web.Controllers
         [HttpGet]
         public IActionResult GetShoppingCart()
         {
-            var list = shoppingCartService.GetShoppingCart(userService.GetUserId(User.Identity.Name)).
+			Log.Information($"{System.Reflection.MethodBase.GetCurrentMethod()} started");
+
+			var list = shoppingCartService.GetShoppingCart(userService.GetUserId(User.Identity.Name)).
                 Select(o => new
                 {
                     o.Id,
@@ -27,21 +30,39 @@ namespace bicycle_store_web.Controllers
                     o.Bicycle.Price,
                     o.Quantity
                 }).ToList();
-            return new JsonResult(new { data = list });
+			Log.Information($"{System.Reflection.MethodBase.GetCurrentMethod()} finished");
+
+			return new JsonResult(new { data = list });
         }
         public IActionResult AddToShoppingCart(int BicycleId)
         {
-            if(shoppingCartService.AddToShoppingCart(BicycleId, userService.GetUserId(User.Identity.Name)))
-                return new JsonResult(new { success = true, message = "Successfully added to shopping cart" });
+			Log.Information($"{System.Reflection.MethodBase.GetCurrentMethod()} started");
+
+            JsonResult result;
+            bool serviceResult = shoppingCartService.AddToShoppingCart(BicycleId, userService.GetUserId(User.Identity.Name));
+			if (serviceResult)
+                result = new JsonResult(new { success = true, message = "Successfully added to shopping cart" });
             else
-                return new JsonResult(new { success = false, message = "Error while adding to shopping cart" });
+                result = new JsonResult(new { success = false, message = "Error while adding to shopping cart" });
+
+			Log.Information($"{System.Reflection.MethodBase.GetCurrentMethod()} finished");
+
+			return result;
         }
         public IActionResult RemoveFromShoppingCart(int ShoppingCartOrderId)
         {
-            if (shoppingCartService.RemoveFromShoppingCart(ShoppingCartOrderId))
-                return new JsonResult(new { success = true, message = "Successfully removed from shopping cart" });
+			Log.Information($"{System.Reflection.MethodBase.GetCurrentMethod()} started");
+
+			JsonResult result;
+			bool serviceResult = shoppingCartService.RemoveFromShoppingCart(ShoppingCartOrderId);
+			if (serviceResult)
+				result = new JsonResult(new { success = true, message = "Successfully removed from shopping cart" });
             else
-                return new JsonResult(new { success = false, message = "Error while removing from shopping cart" });
+				result = new JsonResult(new { success = false, message = "Error while removing from shopping cart" });
+
+			Log.Information($"{System.Reflection.MethodBase.GetCurrentMethod()} finished");
+
+			return result;
         }
     }
 }

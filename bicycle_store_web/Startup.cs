@@ -9,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using System;
+using System.IO;
 
 namespace bicycle_store_web
 {
@@ -25,9 +27,14 @@ namespace bicycle_store_web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
-            //services.AddDbContext<bicycle_storeContext>(options => 
-            //    options.UseMySql(Configuration.GetConnectionString("mssql"), serverVersion));
+			Log.Logger = new LoggerConfiguration()
+				.MinimumLevel.Information()
+				.WriteTo.Console()
+			    .WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "logs.txt"), rollingInterval: RollingInterval.Month)
+			.CreateLogger();
+			//var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
+			//services.AddDbContext<bicycle_storeContext>(options => 
+			//    options.UseMySql(Configuration.GetConnectionString("mssql"), serverVersion));
 			services.AddDbContext<bicycle_storeContext>(options =>
 					options.UseSqlServer(Configuration.GetConnectionString("mssql")));
 
