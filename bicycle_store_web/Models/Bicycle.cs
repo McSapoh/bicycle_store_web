@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-#nullable disable
-
 namespace bicycle_store_web
 {
     public partial class Bicycle
@@ -13,7 +11,7 @@ namespace bicycle_store_web
         {
             BicycleOrders = new HashSet<BicycleOrder>();
         }
-
+        [Key]
         public int Id { get; set; }
         [Required(ErrorMessage = "Please enter bicycle name")]
         public string Name { get; set; }

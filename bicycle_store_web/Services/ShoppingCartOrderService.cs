@@ -43,10 +43,10 @@ namespace bicycle_store_web.Services
         public bool DeleteShoppingCartOrder(int ShoppingCartOrderId)
         {
             var shoppingCartOrder = _shoppingCartOrderRepo.GetById(ShoppingCartOrderId);
-            if (_shoppingCartOrderRepo.GetById(ShoppingCartOrderId) == null)
+            if (shoppingCartOrder == null)
                 return true;
             _shoppingCartOrderRepo.Delete(shoppingCartOrder.Id);
-            if (_shoppingCartOrderRepo.GetById(ShoppingCartOrderId) != null)
+            if (_shoppingCartOrderRepo.GetById(ShoppingCartOrderId) == null)
                 return true;
             else
                 return false;

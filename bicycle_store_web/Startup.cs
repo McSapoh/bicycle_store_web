@@ -25,10 +25,13 @@ namespace bicycle_store_web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
-            services.AddDbContext<bicycle_storeContext>(options => 
-                options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), serverVersion));
-            services.AddControllersWithViews();
+            //var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
+            //services.AddDbContext<bicycle_storeContext>(options => 
+            //    options.UseMySql(Configuration.GetConnectionString("mssql"), serverVersion));
+			services.AddDbContext<bicycle_storeContext>(options =>
+					options.UseSqlServer(Configuration.GetConnectionString("mssql")));
+
+			services.AddControllersWithViews();
 
             // Adding services
             services.AddScoped<IBicycleService, BicycleService>();

@@ -13,7 +13,7 @@ namespace bicycle_store_web
         {
             Orders = new HashSet<Order>();
         }
-
+        [Key]
         public int Id { get; set; }
         [Required(ErrorMessage = "Please enter Your full name")]
         public string FullName { get; set; }

@@ -71,7 +71,7 @@ namespace bicycle_store_web.Services
                 Cost = GetTotalCost(CartOrders),
                 Status = OrderStatus.Processing.ToString()
             };
-            Order.OrderId = _orderRepo.GetMaxId();
+            //Order.OrderId = _orderRepo.GetMaxId();
             _orderRepo.Create(Order);
             foreach (var CartOrder in CartOrders)
             {
