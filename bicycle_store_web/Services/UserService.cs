@@ -92,8 +92,8 @@ namespace bicycle_store_web.Services
 
             if (user.Id == 0)
             {
-                shopingCartService.CreateShopingCart(user.Id);
                 _userRepo.Create(user);
+                shopingCartService.CreateShopingCart(user.Id);
             }
             else
                 _userRepo.Update(user);
