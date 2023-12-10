@@ -5,12 +5,15 @@ using bicycle_store_web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
+using System.Globalization;
 using System.IO;
 
 namespace bicycle_store_web
@@ -32,13 +35,28 @@ namespace bicycle_store_web
 				.WriteTo.Console()
 			    .WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "logs.txt"), rollingInterval: RollingInterval.Month)
 			.CreateLogger();
-			//var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
-			//services.AddDbContext<bicycle_storeContext>(options => 
-			//    options.UseMySql(Configuration.GetConnectionString("mssql"), serverVersion));
-			services.AddDbContext<bicycle_storeContext>(options =>
+            services.AddLocalization(oprions =>
+            {
+                oprions.ResourcesPath = "Resources";
+            });
+            services.Configure<RequestLocalizationOptions>(options => { 
+                var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("uk"), }; 
+                options.DefaultRequestCulture = new RequestCulture("en"); 
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures; 
+            });
+            //var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
+            //services.AddDbContext<bicycle_storeContext>(options => 
+            //    options.UseMySql(Configuration.GetConnectionString("mssql"), serverVersion));
+            services.AddDbContext<bicycle_storeContext>(options =>
 					options.UseSqlServer(Configuration.GetConnectionString("mssql")));
 
-			services.AddControllersWithViews();
+			services.AddControllersWithViews()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization(options => {
+                    options.DataAnnotationLocalizerProvider = (type, factory) =>
+                        factory.Create(typeof(SharedResource));
+                });
 
             // Adding services
             services.AddScoped<IBicycleService, BicycleService>();
@@ -71,6 +89,7 @@ namespace bicycle_store_web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseRequestLocalization();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

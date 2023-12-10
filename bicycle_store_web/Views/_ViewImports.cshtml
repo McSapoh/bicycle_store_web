@@ -1,3 +1,13 @@
 ﻿@using bicycle_store_web
 @using bicycle_store_web.Models
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@using Microsoft.AspNetCore.Builder;
+@using Microsoft.AspNetCore.Localization;
+@using Microsoft.AspNetCore.Mvc.Localization;
+@using Microsoft.Extensions.Options;
+@using bicycle_store_web;
+
+@inject IViewLocalizer localizator
+
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer

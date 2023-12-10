@@ -1,6 +1,5 @@
 ﻿@{Layout = "_Layout";}
 @model List<Bicycle>
-
     <div class="row">
         <div class="col-md-8">
             <h2 class="text-dark">Bicycle List</h2>
@@ -16,12 +15,12 @@
             <img src="data:image/jpeg;base64,@Convert.ToBase64String(bicycle.Photo)"
                  style="height: 250px; width: 250px" />
             <h2 class="text-white">@bicycle.Name</h2>
-            <p>Діаметр коліс @bicycle.WheelDiameter</p>
-            <p>Тип @bicycle.Type.Name</p>
-            <p>Виробник @bicycle.Producer.Name</p>
-            <p>Країна @bicycle.Country.Name</p>
+            <p>@SharedLocalizer["diameter"] @bicycle.WheelDiameter</p>
+            <p>@SharedLocalizer["type"] @bicycle.Type.Name</p>
+            <p>@SharedLocalizer["producer"] @bicycle.Producer.Name</p>
+            <p>@SharedLocalizer["country"] @bicycle.Country.Name</p>
             <div class="row">
-                <p class="col-md-7">Ціна @bicycle.Price&#8372</p>
+                    <p class="col-md-7">@SharedLocalizer["price"] @bicycle.Price&#8372</p>
                 <div class="col-md-5 contaiten-fluid">
                     @{
                         if (bicycle.Quantity != 0)
