@@ -1,5 +1,7 @@
 ﻿using bicycle_store_web.Interfaces;
 using bicycle_store_web.Models;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +20,7 @@ namespace bicycle_store_web.Controllers
         private readonly IUserService userService;
         private readonly ITypeService typeService;
         private readonly IProducerService producerService;
+        //private readonly IValidator<Bicycle> validator;
 
         [BindProperty]
         public Bicycle bicycle { get; set; }
@@ -33,7 +36,7 @@ namespace bicycle_store_web.Controllers
         }
         public AdminController(ILogger<AdminController> logger, bicycle_storeContext context,
             IBicycleService bicycleService, IProducerService producerService, ITypeService typeService,
-            IUserService userService)
+            IUserService userService/*, IValidator<Bicycle> validator*/)
         {
             _logger = logger;
             _db = context;
@@ -41,6 +44,7 @@ namespace bicycle_store_web.Controllers
             this.producerService = producerService;
             this.typeService = typeService;
             this.userService = userService;
+            //this.validator = validator;
         }
         [Authorize(Roles = "SuperAdmin,Admin")]
         public IActionResult Bicycles() => View();
@@ -132,6 +136,12 @@ namespace bicycle_store_web.Controllers
         [HttpPost]
         public IActionResult SaveBicycle(Bicycle bicycle, IFormFile Photo)
         {
+            //ValidationResult result = validator.Validate(bicycle);
+            //if (!result.IsValid)
+            //{
+            //    return View("Index", bicycle);
+            //}
+
             if (ModelState.IsValid)
             {
                 if (bicycleService.SaveBicycle(bicycle, Photo))

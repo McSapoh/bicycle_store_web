@@ -2,9 +2,11 @@ using bicycle_store_web.Interfaces;
 using bicycle_store_web.Models;
 using bicycle_store_web.Repositories;
 using bicycle_store_web.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +78,9 @@ namespace bicycle_store_web
             services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
             services.AddScoped<ITypeRepository, TypeRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+
+
+            //services.AddScoped<IValidator<Bicycle>, BicycleValidator>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => 

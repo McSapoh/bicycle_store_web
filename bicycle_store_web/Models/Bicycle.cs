@@ -1,7 +1,9 @@
 ﻿using bicycle_store_web.Models;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace bicycle_store_web
 {
@@ -31,5 +33,33 @@ namespace bicycle_store_web
         public virtual Type Type { get; set; }
         public virtual ICollection<BicycleOrder> BicycleOrders { get; set; }
         public virtual ICollection<ShoppingCartOrder> BicycleCartOrders { get; set; }
+    }
+
+    public class BicycleValidator : AbstractValidator<Bicycle>
+    {
+        public BicycleValidator()
+        {
+            RuleFor(model => model.Name).NotNull().Length(2, 50).Must(BeAValidName).WithMessage("Name must be a valid name");
+            RuleFor(model => model.WheelDiameter).NotNull().Must(BeAValidFloat).WithMessage("Age must be a valid integer");
+            RuleFor(model => model.Price).NotNull().Must(BeAValidUInteger).WithMessage("Age must be a valid integer");
+
+        }
+        private bool BeAValidUInteger(uint value)
+        {
+            return value > 0;
+        }
+        private bool BeAValidFloat(float value)
+        {
+            return value > 0;
+        }
+        private bool BeAValidName(string value)
+        {
+            if (value != null)
+            {
+                return Regex.IsMatch(value, @"^[A-Z][a-z]+$");
+            }
+            return false;
+
+        }
     }
 }
